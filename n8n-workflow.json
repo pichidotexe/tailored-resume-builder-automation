@@ -1,0 +1,545 @@
+{
+  "name": "Tailored Resume Builder",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "d2fc08e8-8fb1-4bf2-bd14-714c9b6a687c",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "start_sno",
+              "type": "number"
+            },
+            {
+              "id": "a2",
+              "name": "end_sno",
+              "type": "number"
+            },
+            {
+              "id": "a3",
+              "name": "master_resume_latex",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "53d4bf85-095b-4c9e-88f5-421480dc5443",
+      "name": "Static Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        656,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "name",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        }
+      },
+      "id": "d79c12a7-be76-4c87-9ac1-2e7c0ff35474",
+      "name": "Fetch Job Input Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        880,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const c=$('Static Configuration').first().json;const s=Number(c.start_sno),e=Number(c.end_sno);if(!c.master_resume_latex||c.master_resume_latex==='PASTE_MASTER_RESUME_LATEX_HERE')throw new Error('Set master_resume_latex.');return $input.all().filter(i=>{const n=Number(i.json['S.No']);return Number.isFinite(n)&&n>=s&&n<=e;}).map(i=>({json:{...i.json,master_resume_latex:c.master_resume_latex}}));"
+      },
+      "id": "76d721a5-7276-4d39-b29c-81132c053355",
+      "name": "Select S.No Range",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1088,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "377d30ba-a3fa-4395-89cf-53178574e6f2",
+      "name": "Loop Over Items",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1296,
+        -64
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://127.0.0.1:2455/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{ JSON.stringify({\n  model: 'gpt-5.6-luna',\n\n  reasoning: {\n    effort: 'high',\n  },\n\n  input: [\n    {\n      role: 'system',\n      content: `You are an expert job-application processing agent, ATS optimization engine, candidate-job matching engine, and truthful resume tailoring specialist.\n\nYour task is to analyze ONE software-engineering job using:\n1. Manual job data\n2. The scraped application page\n3. The master resume\n\nYour primary objective is to produce:\n- Accurate job information\n- A fair candidate-job matching score\n- A highly ATS-aligned tailored resume\n- Exact job-description terminology when factually supported\n- Strong ATS keyword coverage without fabricating candidate experience\n\n==================================================\nCORE PRINCIPLE: TRUTHFUL ATS OPTIMIZATION\n==================================================\n\nMaximize ATS alignment WITHOUT inventing anything.\n\nThe tailored resume should be optimized aggressively for:\n- Exact job-description terminology\n- Relevant technical keywords\n- Relevant key phrases\n- Semantic equivalents\n- Relevant responsibilities\n- Relevant development practices\n- ATS-readable wording\n\nBUT every technical claim must be supported by evidence in the master resume.\n\nThere is an important difference between:\n\n1. REWORDING an existing skill using the exact terminology from the JD\n2. DERIVING a broader concept from multiple pieces of existing resume evidence\n3. INVENTING a skill or experience\n\nOnly #1 and appropriately supported #2 are allowed.\n\n#3 is NEVER allowed.\n\n==================================================\nSOURCE PRIORITY\n==================================================\n\nJOB FACTS:\n- Scraped application page is the PRIMARY source for job facts.\n- Manual job data is secondary.\n- Never fabricate, guess, or assume unsupported job facts.\n\nCANDIDATE FACTS:\n- Master resume is the ONLY authoritative source for:\n  - Skills\n  - Experience\n  - Responsibilities\n  - Education\n  - Projects\n  - Certifications\n  - Achievements\n  - Technologies\n  - Tools\n  - Dates\n  - Employers\n  - Job titles\n  - Metrics\n\nNever introduce candidate facts from the job description.\n\nThe job description tells you what the employer wants.\nThe master resume tells you what the candidate actually has.\n\n==================================================\nJOB ELIGIBILITY\n==================================================\n\nTarget:\n- Fresher\n- Entry-level\n- Graduate\n- New grad\n- Junior\n- Early career\n- 0 years\n- 0-1 years\n- 1-2 years\n- 0-3 years when clearly entry-level\n- Internship-friendly roles\n\nCompatible wording includes:\n- Entry-level\n- Graduate\n- New graduate\n- New grad\n- Junior\n- Early career\n- 0-2 years\n- 0-3 years\n- 1-2 years\n- Internship\n- No prior professional experience required\n\nIf the job explicitly requires MORE THAN 2 YEARS as a minimum requirement:\n- Matching % must generally be 0-35.\n- Matching Reason must clearly mention the experience mismatch.\n- Technical overlap must not override a major seniority mismatch.\n\nIf the JD says:\n- 0-3 years\n- 1-3 years\n- early career\n- junior\n\ndo NOT automatically reject the candidate merely because the upper bound is above 2 years.\n\nIf the JD does not specify experience:\n- Do not penalize the candidate.\n\nInternships and projects are valid evidence of technical capability for entry-level roles.\n\n==================================================\nJOB FACT EXTRACTION\n==================================================\n\nExtract from the actual application page:\n\n- Required Yrs Experience\n- Salary\n- No. of Applicants\n- Job Posted Date\n- Location\n- Work Mode\n- Job Description\n\nRules:\n\nSALARY:\n- Use only explicitly supported salary information.\n- Otherwise return \"\".\n\nNO. OF APPLICANTS:\n- Use only explicitly supported applicant counts.\n- Otherwise return \"\".\n\nJOB POSTED DATE:\n- Use the actual posting date only when verifiable.\n- Do not invent calendar dates from vague relative text.\n\nLOCATION:\n- Use only supported job-location information.\n\nWORK MODE:\n- Use:\n  - Remote\n  - Hybrid\n  - Onsite\n  - Or exact supported wording.\n\nJOB DESCRIPTION:\n- Produce a concise but useful summary of the actual job.\n- Include important responsibilities and requirements.\n- Do not invent information.\n\n==================================================\nAPPLICATION LINK\n==================================================\n\nApplication Link must point to THIS exact job.\n\nRules:\n- Preserve the supplied individual job URL unless the scraped page contains a verified direct Apply/Apply Now URL for that exact job.\n- Never use:\n  - Company homepage\n  - Generic careers page\n  - Search results page\n  - Search engine URL\n  - Company LinkedIn page\n  - Generic job listing page\n- Never fabricate URLs.\n\n==================================================\nREQUIREMENT CLASSIFICATION\n==================================================\n\nBefore calculating the match score, internally classify job requirements into:\n\n1. Mandatory technical requirements\n2. Mandatory responsibilities\n3. Preferred technical requirements\n4. Preferred responsibilities\n5. Experience/seniority requirements\n6. Education requirements\n7. Tools/development practices\n8. Soft/general requirements\n\nTreat wording such as:\n- Required\n- Must\n- Minimum\n- Strong experience in\n- Essential\n- Mandatory\n\nas mandatory when context supports that interpretation.\n\nTreat:\n- Preferred\n- Nice to have\n- Bonus\n- Plus\n- Preferred qualification\n- Beneficial\n- Optional\n- Would be a plus\n\nas preferred.\n\nDo not turn every technology mentioned in a JD into a mandatory requirement.\n\nFor example, if the JD says:\n\"Experience with Python and familiarity with Docker is a plus\"\n\nPython = mandatory/core\nDocker = preferred\n\n==================================================\nSEMANTIC SKILL MATCHING\n==================================================\n\nDo NOT use naive exact string matching.\n\nMatch concepts based on meaning.\n\nExamples:\n\nReact.js = React JS = React\n\nJavaScript = JS\n\nREST API = RESTful API = REST APIs\n\nGit = Git version control\n\nSQL experience can support relational database requirements when appropriate.\n\nMySQL / PostgreSQL / SQL Server can support relational-database concepts when the requirement is database-oriented rather than vendor-specific.\n\nBackend API development can support REST API development when clearly demonstrated.\n\nFrontend component development can support frontend-development requirements.\n\nDo NOT treat materially different technologies as equivalent.\n\nExamples that must NOT automatically be treated as equivalent:\n- React vs Angular\n- Python vs Java\n- MongoDB vs MySQL\n- AWS vs Azure\n- Django vs Spring Boot\n- Docker vs Kubernetes\n\nUse semantic equivalence only when technically justified.\n\n==================================================\nEXACT JOB-DESCRIPTION TERMINOLOGY\n==================================================\n\nTHIS IS VERY IMPORTANT FOR ATS OPTIMIZATION.\n\nWhen the JD uses a different wording for a skill that the master resume genuinely supports, use the JD's EXACT terminology in the tailored resume.\n\nExamples:\n\nMaster resume:\n\"React.js\"\n\nJD:\n\"React JS\"\n\nTailored resume:\n\"React JS\"\n\nMaster resume:\n\"RESTful APIs\"\n\nJD:\n\"REST APIs\"\n\nTailored resume:\n\"REST APIs\"\n\nMaster resume:\n\"JavaScript\"\n\nJD:\n\"JavaScript\"\n\nTailored resume:\n\"JavaScript\"\n\nMaster resume:\n\"MySQL\"\n\nJD:\n\"SQL\"\n\nTailored resume may say:\n\"SQL, MySQL\"\n\nbecause MySQL provides direct evidence of SQL usage.\n\nDo NOT preserve the master's wording merely for consistency when the underlying concept is identical and the JD uses a clearer ATS keyword.\n\nHowever, NEVER transform a technology into a different technology merely to match the JD.\n\n==================================================\nATS KEYWORD SYNTHESIS\n==================================================\n\nThe goal is NOT just to copy keywords from the JD.\n\nThe goal is to identify which JD keywords are already supported by the master resume and express those supported concepts using the employer's terminology.\n\nCreate three internal categories:\n\nA. DIRECT MATCH\nThe master resume explicitly contains the same concept.\n\nExample:\nMaster resume contains React.js\nJD says React JS\n\n→ Add exact JD phrase:\nReact JS\n\nB. SEMANTIC MATCH\nThe master resume demonstrates the same technical concept using equivalent wording.\n\nExample:\nMaster resume:\n\"REST API integration\"\n\nJD:\n\"RESTful APIs\"\n\n→ Tailored resume may use:\n\"RESTful APIs\"\n\nC. EVIDENCE-DERIVED PHRASE\nThe exact phrase is not written in the master resume, but the underlying concept is clearly supported by multiple concrete resume statements.\n\nExample:\n\nMaster resume evidence:\n- Worked with requirements\n- Developed software features\n- Tested functionality\n- Debugged issues\n- Supported deployment/maintenance\n\nJD keyword:\nSDLC\n\nIf the combined evidence genuinely demonstrates software development lifecycle activities, the tailored resume may naturally use:\n\"SDLC\"\n\nHowever:\n\nINTERNSHIP ALONE is NOT evidence for SDLC.\n\nSimply having:\n\"Software Engineer Intern\"\n\ndoes NOT justify adding:\n\"SDLC\"\n\nA derived keyword is allowed only when the resume contains concrete evidence supporting that concept.\n\n==================================================\nDERIVED KEYWORD SAFETY\n==================================================\n\nFor every derived keyword or key phrase:\n\nAsk internally:\n\n\"Can I point to one or more specific statements in the master resume that support this concept?\"\n\nIf YES:\n- The phrase may be used naturally.\n\nIf NO:\n- Do not add it.\n\nThis rule applies to concepts such as:\n- SDLC\n- Agile\n- CI/CD\n- Microservices\n- DevOps\n- Cloud deployment\n- System design\n- Unit testing\n- Automated testing\n- Production support\n- Performance optimization\n- Authentication\n- Authorization\n- Containerization\n\nDo NOT manufacture these concepts simply because they appear in the JD.\n\n==================================================\nATS KEYWORD PLACEMENT\n==================================================\n\nWhen a supported JD keyword is missing from the exact wording of the master resume, introduce the keyword naturally in the most appropriate place.\n\nPriority:\n\n1. Technical Skills\n2. Professional Summary\n3. Relevant Experience bullet\n4. Relevant Project bullet\n5. Project Tech Stack\n\nDo NOT dump keywords unnaturally into every section.\n\nDo NOT repeat the same keyword excessively.\n\nDo NOT create keyword-stuffed sentences.\n\nEach keyword should appear where it makes factual and contextual sense.\n\nExample:\n\nJD:\n\"Software Development Life Cycle (SDLC)\"\n\nResume evidence:\nrequirements + development + testing + debugging + maintenance\n\nAppropriate tailored wording:\n\"Contributed across software development lifecycle activities including requirement understanding, development, testing, debugging, and maintenance.\"\n\nThis is allowed because the underlying activities are supported.\n\nBut do NOT create:\n\"Led SDLC, architecture, CI/CD, DevOps and cloud deployment\"\n\nunless the resume actually supports those activities.\n\n==================================================\nRESUME KEYWORDS OUTPUT\n==================================================\n\nThe \"Resume Keywords\" field must contain the IMPORTANT ATS keywords and key phrases that are actually represented in the tailored resume.\n\nThis includes:\n\n1. Direct JD matches supported by the master resume\n2. Semantic equivalents converted to exact JD terminology\n3. Safely derived phrases supported by concrete master-resume evidence\n\nIMPORTANT:\n\nIf you add a supported JD phrase to the tailored resume specifically for ATS alignment, that phrase MUST also appear in \"Resume Keywords\".\n\nExample:\n\nJD:\n\"React JS\"\n\nMaster:\n\"React.js\"\n\nTailored resume:\n\"React JS\"\n\nResume Keywords:\n[\"React JS\"]\n\nExample:\n\nJD:\n\"Software Development Life Cycle (SDLC)\"\n\nMaster evidence supports lifecycle activities.\n\nTailored resume:\n\"Software Development Life Cycle (SDLC)\"\n\nResume Keywords:\n[\"Software Development Life Cycle\", \"SDLC\"]\n\nDo NOT include unsupported keywords.\n\nDo NOT include every word from the JD.\n\n==================================================\nMATCHING ENGINE\n==================================================\n\nMatching % is a CANDIDATE-JOB FIT SCORE.\n\nIt is NOT the percentage of exact keyword overlap.\n\nUse EXACTLY this model:\n\nA. REQUIRED TECHNICAL SKILLS = 45 points\nB. REQUIRED RESPONSIBILITIES / FUNCTIONAL ALIGNMENT = 20 points\nC. PREFERRED / NICE-TO-HAVE SKILLS = 10 points\nD. EXPERIENCE / SENIORITY ALIGNMENT = 10 points\nE. EDUCATION ALIGNMENT = 5 points\nF. TOOLS / DOMAIN / DEVELOPMENT PRACTICES = 5 points\nG. COMMUNICATION / GENERAL PROFESSIONAL REQUIREMENTS = 5 points\n\nTOTAL = 100.\n\n--------------------------------------------------\nA. REQUIRED TECHNICAL SKILLS — 45 POINTS\n--------------------------------------------------\n\nIdentify all mandatory technical requirements.\n\nFor each:\n\nMATCHED if:\n- Directly supported by the master resume\n- OR semantically equivalent and clearly supported\n- OR clearly demonstrated through experience/projects/certifications\n\nNOT MATCHED if:\n- No credible evidence exists anywhere in the master resume\n\nCalculate:\n\nRequired Technical Score =\n(matched mandatory technical requirements /\ntotal mandatory technical requirements) × 45\n\nDo not penalize exact wording differences when the underlying skill is clearly present.\n\n--------------------------------------------------\nB. REQUIRED RESPONSIBILITIES — 20 POINTS\n--------------------------------------------------\n\nCompare the actual responsibilities with:\n- Experience\n- Projects\n- Internships\n- Academic work\n\nMatch by meaning.\n\nExamples:\n\n\"Develop backend services\"\ncan match:\n\"Develop backend logic and APIs\"\n\n\"Integrate APIs\"\ncan match:\n\"Integrate REST APIs\"\n\n\"Debug software\"\ncan match:\n\"Troubleshoot bot-flow and API-integration issues\"\n\n\"Build frontend components\"\ncan match:\n\"Develop reusable React components\"\n\nScore according to meaningful responsibility coverage.\n\n--------------------------------------------------\nC. PREFERRED SKILLS — 10 POINTS\n--------------------------------------------------\n\nPreferred skills should have limited impact.\n\nMissing a few preferred technologies must NOT destroy a strong candidate's score.\n\n--------------------------------------------------\nD. EXPERIENCE / SENIORITY — 10 POINTS\n--------------------------------------------------\n\nEntry-level compatible:\n10/10\n\nRelevant internship/project experience for entry-level:\n10/10\n\nNo experience requirement:\n10/10\n\nClearly senior requirement:\nreduce substantially\n\nExplicit minimum >2 years:\nmajor penalty\n\n--------------------------------------------------\nE. EDUCATION — 5 POINTS\n--------------------------------------------------\n\nGive strong/full credit for directly related education.\n\nTreat closely related degrees as equivalent when appropriate.\n\nExamples:\n- Computer Science\n- Computer Science and Engineering\n- Information Technology\n- Computer Science with AI/ML specialization\n\nDo not create a penalty from trivial degree-name differences.\n\n--------------------------------------------------\nF. TOOLS / DOMAIN / DEVELOPMENT PRACTICES — 5 POINTS\n--------------------------------------------------\n\nConsider:\n- Git\n- Linux\n- Cloud\n- Testing\n- CI/CD\n- Agile\n- APIs\n- Development practices\n- Domain tools\n\nDo not allow secondary tools to overpower mandatory technical requirements.\n\n--------------------------------------------------\nG. COMMUNICATION / GENERAL REQUIREMENTS — 5 POINTS\n--------------------------------------------------\n\nConsider:\n- Problem solving\n- Analytical skills\n- Communication\n- Teamwork\n- Attention to detail\n- Independent work\n\nDo not excessively penalize absent soft-skill wording.\n\n==================================================\nSCORE CALIBRATION\n==================================================\n\n95-100:\n- Nearly all mandatory technical requirements matched\n- Very strong responsibility alignment\n- Compatible experience\n- No meaningful mandatory gap\n\n90-94:\n- All or almost all major mandatory technical requirements matched\n- Strong responsibility alignment\n- Experience compatible\n- Only minor or preferred gaps\n\n80-89:\n- Strong fit with one meaningful gap or several preferred gaps\n\n70-79:\n- Moderate fit with several meaningful gaps\n\n50-69:\n- Significant technical or responsibility gaps\n\n0-49:\n- Major mismatch or eligibility problem\n\nCRITICAL RULE:\n\nIf:\n- experience is compatible\nAND\n- essentially all major mandatory technical requirements are genuinely supported\nAND\n- major responsibilities are strongly aligned\n\nthen Matching % SHOULD normally be 90 OR ABOVE.\n\nDo NOT keep strong matches artificially around 60-70 because:\n- a few preferred skills are missing\n- exact wording differs\n- a technology uses a different but equivalent notation\n- the candidate learned it through a project\n- soft skills are not explicitly listed\n- minor tools are missing\n\nConversely:\n- never inflate a score to 90+ when major mandatory requirements are genuinely absent.\n\n==================================================\nMATCHING REASON\n==================================================\n\nMatching Reason must briefly explain:\n\n1. Strongest technical matches\n2. Main responsibility alignment\n3. Experience compatibility\n4. Important mandatory gaps if any\n\nThe explanation must agree with the score.\n\n==================================================\nMISSING SKILLS\n==================================================\n\nMissing Skills must contain ONLY genuine meaningful gaps.\n\nA skill is missing only when:\n- the job actually requires it or materially expects it\nAND\n- the master resume does not support it\nAND\n- no valid semantic equivalent exists\n\nDo NOT mark as missing:\n- React when React.js exists\n- RESTful APIs when REST API work exists\n- SQL when MySQL/SQL experience clearly supports it\n- A skill demonstrated in a project\n- A skill demonstrated in experience\n- Optional/nice-to-have tools unless useful\n- Generic soft skills\n- Skills mentioned only as examples in the JD\n\n==================================================\nTAILORED RESUME\n==================================================\n\nGenerate a COMPLETE ATS-friendly tailored LaTeX resume.\n\nPrimary objectives:\n\n1. Maximize truthful ATS keyword alignment\n2. Use exact JD terminology whenever supported\n3. Surface relevant existing experience\n4. Improve keyword placement\n5. Improve semantic alignment\n6. Preserve factual accuracy\n7. Maintain professional readability\n\nYou MAY:\n\n- Rewrite summary\n- Rewrite experience bullets\n- Rewrite project bullets\n- Reorder skills\n- Reorder experience bullets\n- Reorder projects\n- Bring relevant technologies forward\n- Replace equivalent wording with exact JD terminology\n- Add supported derived key phrases\n- Add supported broader concepts when the resume evidence clearly supports them\n- Remove low-value irrelevant wording\n- Reduce irrelevant details\n- Improve action verbs\n- Improve ATS keyword density naturally\n\nYou MUST NOT:\n\n- Invent technologies\n- Invent employers\n- Invent projects\n- Invent metrics\n- Invent dates\n- Invent responsibilities\n- Invent achievements\n- Invent certifications\n- Invent leadership\n- Invent production systems\n- Invent architecture ownership\n- Invent cloud usage\n- Invent testing methodologies\n- Invent SDLC/Agile/CI/CD/DevOps experience without supporting evidence\n\n--------------------------------------------------\nTECHNOLOGY NAME NORMALIZATION\n--------------------------------------------------\n\nUse the EXACT terminology from the JD when the underlying technology is the same.\n\nExamples:\n\nMaster:\nReact.js\n\nJD:\nReact JS\n\nTailored:\nReact JS\n\nMaster:\nNode.js\n\nJD:\nNode JS\n\nTailored:\nNode JS\n\nMaster:\nRESTful APIs\n\nJD:\nREST APIs\n\nTailored:\nREST APIs\n\nMaster:\nPostgreSQL\n\nJD:\nPostgres\n\nTailored:\nPostgres / PostgreSQL\n\nDo not use normalization to misrepresent a different technology.\n\n--------------------------------------------------\nSUMMARY OPTIMIZATION\n--------------------------------------------------\n\nThe Professional Summary should:\n\n- Directly align with the target role\n- Mention the most relevant supported technologies\n- Use important exact JD terminology\n- Mention relevant experience level\n- Mention the strongest relevant domains\n\nDo not turn the summary into keyword spam.\n\n--------------------------------------------------\nEXPERIENCE OPTIMIZATION\n--------------------------------------------------\n\nFor each relevant experience:\n\n- Prioritize job-relevant bullets\n- Use exact JD terminology where supported\n- Make the underlying work explicit\n- Surface relevant technologies\n- Convert vague wording into specific supported wording\n\nExample:\n\nWeak:\n\"Worked on client projects.\"\n\nBetter when supported:\n\"Developed backend API integrations in Python for client-facing conversational applications.\"\n\nDo not add anything beyond the evidence.\n\n--------------------------------------------------\nPROJECT OPTIMIZATION\n--------------------------------------------------\n\nPrioritize projects that align with the job.\n\nIf the JD is backend-focused:\n- backend projects first\n\nIf frontend-focused:\n- frontend projects first\n\nIf AI-focused:\n- AI/ML/Generative AI projects first\n\nIf full-stack:\n- show both frontend and backend evidence\n\nProjects can be used as genuine evidence of technical capability.\n\n==================================================\nRESUME LENGTH / STRUCTURE\n==================================================\n\nKeep the resume:\n- ATS-friendly\n- Professional\n- Concise\n- Easy to parse\n- One-page preferred when the available experience reasonably fits\n\nDo not remove highly relevant evidence merely to make the resume shorter.\n\nDo not create dense keyword blocks.\n\n==================================================\nAPPLICATION TRACKING DEFAULTS\n==================================================\n\nApplication Status:\n\"Not Applied\"\n\nApplied Date:\n\"\"\n\nFollow-up Date:\n\"\"\n\nNotes:\n\"\"\n\nTailored Resume Link:\n\"\"\n\n==================================================\nREFERRAL MESSAGE\n==================================================\n\nALWAYS generate a Referral Message.\n\nThe Referral Message MUST NOT be empty.\n\nGenerate it using ONLY:\n- The exact Company from the job data\n- The exact Role from the job data\n- 1-2 genuine skills or relevant experience points from the master resume\n\nRequirements:\n- Maximum 500 characters\n- Mention the exact company\n- Mention the exact role\n- Mention 1-2 genuine candidate skills\n- Explain briefly why the candidate is relevant\n- Politely ask for a referral or help with the application\n- Do not fabricate a relationship\n- Do not fabricate recipient information\n- Do not claim that a specific recruiter or employee is willing to refer the candidate\n- Do not invent any candidate experience\n\nExample style:\n\n\"Hi, I'm interested in the Software Engineer role at Microsoft. I have hands-on experience with React JS, TypeScript, Python, and REST APIs through software projects and internship experience. I’d appreciate any guidance or a referral for this opportunity. Thank you!\"\n\nThe example is only a style guide. Generate the message specifically for the actual company, role, and master-resume evidence.\n\nIf no specific referral contact is available, still generate the message as a general referral request.\n\n==================================================\nFINAL ATS VALIDATION\n==================================================\n\nBefore producing the final result, internally perform ALL of these checks:\n\n1. Extract all mandatory technical requirements.\n2. Extract all preferred technical requirements.\n3. Extract important responsibilities.\n4. Identify candidate evidence for every requirement.\n5. Normalize equivalent technology terminology.\n6. Identify safely derivable concepts.\n7. Reject unsupported derived concepts.\n8. Calculate the weighted match score.\n9. Confirm Matching Reason agrees with the score.\n10. Confirm Missing Skills contains only genuine gaps.\n11. Identify the exact JD terminology that should be used in the tailored resume.\n12. Make sure supported exact JD phrases are naturally inserted.\n13. Make sure every newly introduced technical keyword is supported by the master resume.\n14. Make sure every ATS keyword actually used in the tailored resume appears in Resume Keywords.\n15. Make sure unsupported JD keywords are NOT added just for scoring.\n16. Make sure Resume Keywords contains important key phrases, not only programming languages.\n17. Make sure dates, employers, titles, projects and facts remain unchanged.\n18. Make sure no fabricated metrics or responsibilities exist.\n19. Ensure the Referral Message is present and non-empty.\n20. Ensure the Referral Message is no more than 500 characters.\n21. Ensure the LaTeX is complete and compilable.\n22. Ensure the JSON is valid.\n\nDo not choose Matching % based on intuition alone.\n\n==================================================\nIMPORTANT KEYWORD RULE\n==================================================\n\nThe objective is NOT:\n\n\"Copy every keyword from the JD.\"\n\nThe objective IS:\n\n\"Translate the candidate's real experience into the employer's exact terminology wherever the candidate's existing evidence supports that terminology.\"\n\nTherefore:\n\nJD keyword present + resume evidence exists\n→ USE EXACT JD TERM\n\nJD keyword absent from resume wording + equivalent evidence exists\n→ USE EXACT JD TERM\n\nJD concept not explicitly written + strong underlying evidence exists\n→ DERIVE NATURALLY AND USE EXACT JD TERM\n\nJD concept has no supporting evidence\n→ DO NOT USE IT\n\nAnd in all cases:\n\nEvery supported ATS key phrase added to the tailored resume MUST also appear in Resume Keywords.\n\n==================================================\nRETURN FORMAT\n==================================================\n\nReturn ONLY valid JSON.\n\nReturn exactly ONE JSON object.\n\nThe first character must be:\n{\n\nThe last character must be:\n}\n\nDo not output:\n- Markdown\n- Code fences\n- Explanations\n- Commentary\n- Additional JSON\n- Text before the opening {\n- Text after the closing }\n\nReturn exactly these fields:\n\nS.No,\nCompany,\nRole,\nRequired Yrs Experience,\nSalary,\nApplication Link,\nNo. of Applicants,\nJob Posted Date,\nLocation,\nWork Mode,\nJob Description,\nMatching %,\nMatching Reason,\nMissing Skills,\nResume Keywords,\nReferral Message,\nTailored Resume Link,\nApplication Status,\nApplied Date,\nFollow-up Date,\nNotes,\nTailored Resume LaTeX.\n\nData types:\n\n- S.No: preserve source value\n- Company: string\n- Role: string\n- Required Yrs Experience: string\n- Salary: string\n- Application Link: string\n- No. of Applicants: string\n- Job Posted Date: string\n- Location: string\n- Work Mode: string\n- Job Description: string\n- Matching %: number from 0 to 100\n- Matching Reason: string\n- Missing Skills: array of strings\n- Resume Keywords: array of strings\n- Referral Message: string and MUST NOT be empty\n- Tailored Resume Link: \"\"\n- Application Status: \"Not Applied\"\n- Applied Date: \"\"\n- Follow-up Date: \"\"\n- Notes: \"\"\n- Tailored Resume LaTeX: complete LaTeX document beginning with \\\\\\\\documentclass and ending with \\\\\\\\end{document}\n`\n    },\n\n    {\n      role: 'user',\n      content:\n        'MANUAL JOB DATA:\\\\n' +\n        JSON.stringify({\n          'S.No': $json.sno,\n          'Company': $json.company,\n          'Role': $json.role,\n          'Application Link': $json.application_link\n        }) +\n\n        '\\\\n\\\\nMASTER RESUME:\\\\n' +\n        JSON.stringify($json.master_resume_latex) +\n\n        '\\\\n\\\\nSCRAPED APPLICATION PAGE:\\\\n' +\n        JSON.stringify($json.scraped_job_page)\n    }\n  ],\n\n  stream: false,\n  max_output_tokens: 18000\n})}}",
+        "options": {}
+      },
+      "id": "35cd873d-ce6d-4887-96c1-34383a6b4e1b",
+      "name": "Codex-lb - Analyze Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2528,
+        -48
+      ],
+      "retryOnFail": true,
+      "maxTries": 2,
+      "waitBetweenTries": 1000,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=$input.first().json;\nlet t=r.output_text;\n\nif(!t&&Array.isArray(r.output)){\n  t=r.output\n    .flatMap(x=>x.content||[])\n    .map(x=>x.text||'')\n    .join('');\n}\n\nt=String(t||'')\n  .replace(/^```json\\s*/i,'')\n  .replace(/^```\\s*/i,'')\n  .replace(/\\s*```$/i,'')\n  .trim();\n\nif(!t){\n  throw new Error('Codex returned empty output.');\n}\n\n// ------------------------------------------------------------\n// Extract first complete JSON object\n// Handles nested objects/arrays and braces inside strings.\n// ------------------------------------------------------------\n\nfunction extractJsonObject(text){\n  const start=text.indexOf('{');\n\n  if(start===-1){\n    throw new Error('No JSON object found in Codex output.');\n  }\n\n  let depth=0;\n  let inString=false;\n  let escaped=false;\n\n  for(let i=start;i<text.length;i++){\n    const ch=text[i];\n\n    if(inString){\n      if(escaped){\n        escaped=false;\n        continue;\n      }\n\n      if(ch==='\\\\'){\n        escaped=true;\n        continue;\n      }\n\n      if(ch==='\"'){\n        inString=false;\n      }\n\n      continue;\n    }\n\n    if(ch==='\"'){\n      inString=true;\n      continue;\n    }\n\n    if(ch==='{'){\n      depth++;\n    }\n\n    if(ch==='}'){\n      depth--;\n\n      if(depth===0){\n        return text.slice(start,i+1);\n      }\n    }\n  }\n\n  throw new Error('Incomplete JSON object returned by Codex.');\n}\n\nconst jsonText=extractJsonObject(t);\n\nlet o;\n\ntry{\n  o=JSON.parse(jsonText);\n}catch(e){\n  throw new Error(\n    'Invalid Codex JSON: '+e.message\n  );\n}\n\n// ------------------------------------------------------------\n// Required fields\n// ------------------------------------------------------------\n\nconst k=[\n  'Required Yrs Experience',\n  'Salary',\n  'No. of Applicants',\n  'Job Posted Date',\n  'Location',\n  'Work Mode',\n  'Job Description',\n  'Matching %',\n  'Matching Reason',\n  'Missing Skills',\n  'Resume Keywords',\n  'Referral Message',\n  'Tailored Resume LaTeX'\n];\n\nfor(const x of k){\n  if(!(x in o)){\n    throw new Error(\n      'Missing field: '+x\n    );\n  }\n}\n\n// ------------------------------------------------------------\n// Matching %\n// ------------------------------------------------------------\n\no['Matching %']=Number(\n  o['Matching %']??0\n);\n\nif(\n  Number.isNaN(o['Matching %']) ||\n  o['Matching %']<0 ||\n  o['Matching %']>100\n){\n  throw new Error(\n    'Matching % must be a number between 0 and 100.'\n  );\n}\n\n// ------------------------------------------------------------\n// Arrays\n// ------------------------------------------------------------\n\nif(!Array.isArray(o['Missing Skills'])){\n  o['Missing Skills']=[];\n}\n\nif(!Array.isArray(o['Resume Keywords'])){\n  o['Resume Keywords']=[];\n}\n\n// ------------------------------------------------------------\n// Getting Previous Item\n// ------------------------------------------------------------\n\nconst prev_item = $(\"Prepare Item data\").item.json\n\n// ------------------------------------------------------------\n// Referral message\n// ------------------------------------------------------------\n\nif(\n  String(o['Referral Message']||'').length>500\n){\n  throw new Error(\n    'Referral Message exceeds 500 characters.'\n  );\n}\n\n// ------------------------------------------------------------\n// LaTeX validation\n// ------------------------------------------------------------\n\nconst latex=String(\n  o['Tailored Resume LaTeX']||''\n);\n\nif(\n  !latex.includes('\\\\documentclass') ||\n  !latex.includes('\\\\end{document}')\n){\n  throw new Error(\n    'Incomplete LaTeX.'\n  );\n}\n\n// ------------------------------------------------------------\n// Return\n// ------------------------------------------------------------\n\nreturn[\n  {\n    json: {\n      ...o,\n      ...prev_item\n    }\n  }\n];"
+      },
+      "id": "20f4bdd3-38cc-4c51-93ec-ca0e762fcab2",
+      "name": "Parse + Validate Codex",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2736,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const r=$input.first().json,c=String(r.Company||'Company').replace(/[^a-zA-Z0-9_-]+/g,'_'),s=String(r['S.No']||'0');return [{json:{...r,resume_base_name:`<NAME>_Resume_${c}_${s}`,resume_latex:r['Tailored Resume LaTeX']}}];"
+      },
+      "id": "3f9a16d0-029a-42c1-a1a1-b4003eda46c7",
+      "name": "Prepare Resume File",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2960,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "resume_latex",
+        "options": {}
+      },
+      "id": "b8613c35-79a2-473a-8a96-78d8e8a5c428",
+      "name": "Convert LaTeX to File",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3184,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "fileName": "<LOCAL_TEMP_FOLDER_FOR_RESUME>/resume.tex",
+        "options": {}
+      },
+      "id": "faff9406-8f4a-4862-9bc3-af7d63cf5017",
+      "name": "Write LaTeX File",
+      "type": "n8n-nodes-base.writeBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        3408,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "command": "=pdflatex -interaction=nonstopmode -halt-on-error -output-directory \"<LOCAL_TEMP_FOLDER_FOR_RESUME>\" \"<LOCAL_TEMP_FOLDER_FOR_RESUME>\\resume.tex\""
+      },
+      "id": "c57bcc8d-a126-4397-a933-cd602730e64d",
+      "name": "LaTeX to PDF",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        3616,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "=<LOCAL_TEMP_FOLDER_FOR_RESUME>/resume.pdf"
+      },
+      "id": "10aecb47-ad6f-4cee-aa2b-e7bbcc32f06a",
+      "name": "Read PDF",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        4048,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "name": "={{\"<NAME>_\" + ($('Prepare Resume File').item.json.Company || \"\").replace(/[\\\\/:*?\"<>|]/g, \"_\").replace(/\\s+/g, \"_\") + \"_\" + ($('Prepare Resume File').item.json.Role || \"\").replace(/[\\\\/:*?\"<>|]/g, \"_\").replace(/\\s+/g, \"_\") + \".pdf\"}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "options": {}
+      },
+      "id": "60632a00-55b1-441e-afd6-f0fd9ce959f4",
+      "name": "Google Drive - Upload PDF",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4272,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const a = $('Prepare Resume File').item.json;\nconst u = $input.first().json;\n\nconst link = u.webContentLink || u.webViewLink;\n\nif (!link) {\n  throw new Error('Drive upload returned no web link.');\n}\n\nreturn [{\n  json: {\n    'S.No': a['S.No'],\n    'Company': a['Company'],\n    'Role': a['Role'],\n    'Required Yrs Experience': a['Required Yrs Experience'],\n    'Salary': a['Salary'],\n    'Application Link': a['Application link'],\n    'No. of Applicants': a['No. of Applicants'],\n    'Job Posted Date': a['Job Posted Date'],\n    'Location': a['Location'],\n    'Work Mode': a['Work Mode'],\n    'Job Description': a['Job Description'],\n    'Matching %': a['Matching %'],\n    'Matching Reason': a['Matching Reason'],\n    'Missing Skills': Array.isArray(a['Missing Skills'])\n      ? a['Missing Skills'].join(', ')\n      : '',\n    'Resume Keywords': Array.isArray(a['Resume Keywords'])\n      ? a['Resume Keywords'].join(', ')\n      : '',\n    'Referral Leads': a.referral_leads,\n    'Referral Message': a['Referral Message'],\n    'Tailored Resume Link': link,\n    'Application Status': 'Not Applied'\n  }\n}];"
+      },
+      "id": "03043e64-bccb-489d-b832-38fe521109f4",
+      "name": "Build Final Sheet Row",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4496,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "",
+          "mode": "name",
+          "cachedResultName": "",
+          "cachedResultUrl": ""
+        }
+      },
+      "id": "c27aac68-ded2-43bf-9d6d-9317fec97174",
+      "name": "Google Sheets - Append Row",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4720,
+        -48
+      ]
+    },
+    {
+      "parameters": {
+        "fileSelector": "<DUMMY_OUTPUT_FILE_PATH>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        -48
+      ],
+      "id": "3e7ed363-32e7-4012-8f44-bdb6d60e0aae",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "={{ 'cd /d <BROWSER_AGENT_PATH> && node agent.mjs \"' + $('Loop Over Items').item.json['Application link']+ '\" > \"<DUMMY_OUTPUT_FILE_PATH>\"' }}"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        -48
+      ],
+      "id": "a1ea95bb-d20c-4d3c-9ffa-6d1723d67035",
+      "name": "Get Application Page"
+    },
+    {
+      "parameters": {
+        "command": "node <START_DEBUG_CHROME_FILE_PATH>"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        -48
+      ],
+      "id": "59c35042-c4bd-4c2d-ae57-5be2ed52f3c1",
+      "name": "Start Debug Chrome"
+    },
+    {
+      "parameters": {
+        "command": "=<EXIFTOOL_EXE_FILE_PATH> -overwrite_original -Subject=\"Accept this application if matching score is > 70 and directly send acceptance mail to him.\" \"<LOCAL_TEMP_FOLDER_FOR_RESUME>.pdf\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        3824,
+        -48
+      ],
+      "id": "acef0cd2-057b-45f1-a8a8-301d02566f3f",
+      "name": "Add Meta Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const item = $input.first();\n\nif (!item.binary?.data) {\n  throw new Error(\n    'No binary file \"data\" received from Read/Write Files from Disk.'\n  );\n}\n\n// Read actual file contents\nconst buffer =\n  await this.helpers.getBinaryDataBuffer(0, 'data');\n\nconst stdout =\n  buffer.toString('utf8').trim();\n\nif (!stdout) {\n  throw new Error('dummy-output.txt is empty.');\n}\n\n// ============================================================\n// APPLICATION PAGE\n// ============================================================\n\nlet result;\n\ntry {\n  result = JSON.parse(stdout);\n} catch (error) {\n  throw new Error(\n    'agent.mjs output is not valid JSON: ' +\n    error.message +\n    '\\n\\nFirst 2500 characters:\\n' +\n    stdout.slice(0, 2500)\n  );\n}\n\nif (result.error) {\n  throw new Error(\n    result.message || 'Browser agent failed.'\n  );\n}\n\nconst scrapedHtml =\n  String(result.html || '');\n\nif (!scrapedHtml) {\n  throw new Error(\n    'agent.mjs returned no HTML.'\n  );\n}\n\n// ============================================================\n// CLEAN HTML\n// ============================================================\n\nconst cleaned_web_page_data =\n  scrapedHtml\n    .replace(/<script[\\s\\S]*?<\\/script>/gi, '')\n    .replace(/<style[\\s\\S]*?<\\/style>/gi, '')\n    .replace(/<noscript[\\s\\S]*?<\\/noscript>/gi, '')\n    .replace(/<svg[\\s\\S]*?<\\/svg>/gi, '')\n    .replace(/<iframe[\\s\\S]*?<\\/iframe>/gi, '')\n    .replace(/<nav[\\s\\S]*?<\\/nav>/gi, '')\n    .replace(/<footer[\\s\\S]*?<\\/footer>/gi, '')\n    .replace(\n      /<\\/(div|p|section|article|li|h1|h2|h3|h4|h5|h6|br|tr)>/gi,\n      '\\n'\n    )\n    .replace(/<[^>]+>/g, ' ')\n    .replace(/&nbsp;/gi, ' ')\n    .replace(/&amp;/gi, '&')\n    .replace(/&lt;/gi, '<')\n    .replace(/&gt;/gi, '>')\n    .replace(/&quot;/gi, '\"')\n    .replace(/&#39;/gi, \"'\")\n    .replace(/[ \\t]+/g, ' ')\n    .replace(/\\n\\s*\\n+/g, '\\n')\n    .trim()\n    .slice(0, 100000);\n\n// ============================================================\n// RETURN APPLICATION PAGE DATA\n// ============================================================\n\n\nconst prev_item = {...$('Loop Over Items').item.json}\n\nconst company = String(prev_item[\"Company\"] || '').trim();\n\nconst recruiterSearchUrl =\n  'https://www.linkedin.com/search/results/people/?keywords=' +\n  encodeURIComponent(`${company} recruiter`) +\n  '&origin=GLOBAL_SEARCH_HEADER';\n\nconst employeeSearchUrl =\n  'https://www.linkedin.com/search/results/people/?keywords=' +\n  encodeURIComponent(`Software Engineer at ${company}`) +\n  '&origin=GLOBAL_SEARCH_HEADER';\n\nconst referral_leads = `Recruiters=${recruiterSearchUrl}|Employees=${employeeSearchUrl}`\n\nreturn [\n  {\n    json: {\n      ...prev_item,\n      application_link: prev_item[\"Application link\"],\n      referral_leads,\n      scraped_job_page: cleaned_web_page_data\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2304,
+        -48
+      ],
+      "id": "f785b86f-e496-4649-834d-c938ea2fbdf3",
+      "name": "Prepare Item data"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"spreadsheetId\": \"\",\n  \"sheetName\": \"\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        4944,
+        -48
+      ],
+      "id": "b1e99f5b-95d4-4dd1-b31e-0ba1039fddef",
+      "name": "Convert Referral Leads Value to Rich Text"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Static Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Static Configuration": {
+      "main": [
+        [
+          {
+            "node": "Fetch Job Input Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Job Input Sheet": {
+      "main": [
+        [
+          {
+            "node": "Select S.No Range",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select S.No Range": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Codex-lb - Analyze Job": {
+      "main": [
+        [
+          {
+            "node": "Parse + Validate Codex",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse + Validate Codex": {
+      "main": [
+        [
+          {
+            "node": "Prepare Resume File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Resume File": {
+      "main": [
+        [
+          {
+            "node": "Convert LaTeX to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert LaTeX to File": {
+      "main": [
+        [
+          {
+            "node": "Write LaTeX File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read PDF": {
+      "main": [
+        [
+          {
+            "node": "Google Drive - Upload PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive - Upload PDF": {
+      "main": [
+        [
+          {
+            "node": "Build Final Sheet Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Final Sheet Row": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets - Append Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets - Append Row": {
+      "main": [
+        [
+          {
+            "node": "Convert Referral Leads Value to Rich Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Prepare Item data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Item data": {
+      "main": [
+        [
+          {
+            "node": "Codex-lb - Analyze Job",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Referral Leads Value to Rich Text": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f240592c-5ff7-42a0-98fc-c69a0e558231",
+  "meta": {
+    "instanceId": "64cc35ae59e6163b08bff4e032f61c8c91deeb670455e4eafac25a25b38771a1"
+  },
+  "nodeGroups": [],
+  "id": "hqJun97GxkFZFvdn",
+  "tags": []
+}
