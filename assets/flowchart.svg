@@ -1,0 +1,407 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 1620" width="100%" height="100%">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0b0f19" />
+      <stop offset="50%" stop-color="#111827" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Stage Header Gradients -->
+    <linearGradient id="gradStage0" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#06b6d4" />
+    </linearGradient>
+
+    <linearGradient id="gradStage1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#d946ef" />
+    </linearGradient>
+
+    <linearGradient id="gradStage2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#14b8a6" />
+    </linearGradient>
+
+    <linearGradient id="gradStage3" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#ea580c" />
+    </linearGradient>
+
+    <linearGradient id="gradStage4" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ec4899" />
+      <stop offset="100%" stop-color="#f43f5e" />
+    </linearGradient>
+
+    <!-- Arrow Marker -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#64748b" />
+    </marker>
+    <marker id="arrowLoop" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#38bdf8" />
+    </marker>
+
+    <!-- Card Shadow -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.45" />
+    </filter>
+  </defs>
+
+  <style>
+    .title { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-weight: 800; fill: #ffffff; font-size: 26px; }
+    .subtitle { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-size: 14px; fill: #94a3b8; }
+    .stage-title { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-weight: 700; fill: #ffffff; font-size: 15px; letter-spacing: 0.5px; }
+    .node-title { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-weight: 600; font-size: 14px; fill: #f1f5f9; }
+    .node-desc { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-size: 11px; fill: #94a3b8; }
+    .node-tag { font-family: 'Segoe UI', Inter, -apple-system, sans-serif; font-size: 9.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .wire { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrow); stroke-dasharray: 4 0; }
+    .wire-loop { stroke: #38bdf8; stroke-width: 2.5; fill: none; marker-end: url(#arrowLoop); stroke-dasharray: 6 4; }
+  </style>
+
+  <!-- Deep Canvas Background -->
+  <rect width="1100" height="1620" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- ================= HEADER ================= -->
+  <g transform="translate(60, 40)">
+    <rect x="0" y="0" width="980" height="75" rx="12" fill="#1e293b" stroke="#334155" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <text x="30" y="34" class="title">⚡ Tailored Resume Creator &amp; Application Pipeline</text>
+    <text x="30" y="58" class="subtitle">Complete n8n Architecture Flow: Google Sheets ➔ Playwright CDP ➔ Codex-lb AI ➔ LaTeX PDF ➔ Google Drive</text>
+  </g>
+
+  <!-- ================= STAGE 0: TRIGGER & INPUT ================= -->
+  <g transform="translate(60, 140)">
+    <rect x="0" y="0" width="980" height="150" rx="14" fill="#131c2e" stroke="#2563eb" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <!-- Stage Badge -->
+    <rect x="20" y="-12" width="220" height="26" rx="6" fill="url(#gradStage0)"/>
+    <text x="32" y="5" class="stage-title">STAGE 0: TRIGGER &amp; CONFIG</text>
+
+    <!-- Node 1: Manual Trigger -->
+    <g transform="translate(25, 32)">
+      <rect width="210" height="85" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.4"/>
+      <rect x="12" y="12" width="70" height="18" rx="4" fill="#0284c7"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">TRIGGER</text>
+      <text x="12" y="48" class="node-title">Manual Trigger</text>
+      <text x="12" y="68" class="node-desc">Click 'Test Workflow' in n8n</text>
+    </g>
+
+    <!-- Arrow 1 -> 2 -->
+    <path d="M 235 74 L 265 74" class="wire"/>
+
+    <!-- Node 2: Static Config -->
+    <g transform="translate(270, 32)">
+      <rect width="210" height="85" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.4"/>
+      <rect x="12" y="12" width="55" height="18" rx="4" fill="#0369a1"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">SETUP</text>
+      <text x="12" y="48" class="node-title">Static Configuration</text>
+      <text x="12" y="68" class="node-desc">Set Start/End S.No &amp; LaTeX</text>
+    </g>
+
+    <!-- Arrow 2 -> 3 -->
+    <path d="M 480 74 L 510 74" class="wire"/>
+
+    <!-- Node 3: Fetch Sheet -->
+    <g transform="translate(515, 32)">
+      <rect width="210" height="85" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.4"/>
+      <rect x="12" y="12" width="85" height="18" rx="4" fill="#0284c7"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">GOOGLE SHEET</text>
+      <text x="12" y="48" class="node-title">Fetch Job Input Sheet</text>
+      <text x="12" y="68" class="node-desc">Reads rows from 'Job Links'</text>
+    </g>
+
+    <!-- Arrow 3 -> 4 -->
+    <path d="M 725 74 L 755 74" class="wire"/>
+
+    <!-- Node 4: Select Range -->
+    <g transform="translate(760, 32)">
+      <rect width="195" height="85" rx="10" fill="#1e293b" stroke="#38bdf8" stroke-width="1.4"/>
+      <rect x="12" y="12" width="50" height="18" rx="4" fill="#0369a1"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">FILTER</text>
+      <text x="12" y="48" class="node-title">Select S.No Range</text>
+      <text x="12" y="68" class="node-desc">start_sno ≤ S.No ≤ end_sno</text>
+    </g>
+  </g>
+
+  <!-- Wire Stage 0 -> Loop Node -->
+  <path d="M 550 290 L 550 325" class="wire"/>
+
+  <!-- ================= LOOP OVER ITEMS ================= -->
+  <g transform="translate(380, 325)">
+    <rect width="340" height="60" rx="12" fill="#1e293b" stroke="#38bdf8" stroke-width="2" filter="url(#cardShadow)"/>
+    <circle cx="35" cy="30" r="14" fill="#0284c7"/>
+    <text x="29" y="35" font-family="'Segoe UI', sans-serif" font-size="16" fill="#fff">🔁</text>
+    <text x="65" y="28" class="node-title">Loop Over Items (Split In Batches)</text>
+    <text x="65" y="46" class="node-desc">Processes jobs 1-by-1 sequentially in batches of 1</text>
+  </g>
+
+  <!-- Wire Loop Node -> Stage 1 -->
+  <path d="M 550 385 L 550 420" class="wire"/>
+
+  <!-- ================= STAGE 1: BROWSER AUTOMATION ================= -->
+  <g transform="translate(60, 420)">
+    <rect x="0" y="0" width="980" height="190" rx="14" fill="#181329" stroke="#9333ea" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <!-- Stage Badge -->
+    <rect x="20" y="-12" width="310" height="26" rx="6" fill="url(#gradStage1)"/>
+    <text x="32" y="5" class="stage-title">STAGE 1: BROWSER AGENT (SCRAPING)</text>
+
+    <!-- Node 1: Start Debug Chrome -->
+    <g transform="translate(25, 35)">
+      <rect width="215" height="120" rx="10" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.3"/>
+      <rect x="12" y="12" width="70" height="18" rx="4" fill="#7c3aed"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">EXEC CMD</text>
+      <text x="12" y="48" class="node-title">Start Debug Chrome</text>
+      <text x="12" y="68" class="node-desc">node start-debug-chrome.mjs</text>
+      <text x="12" y="86" class="node-desc">• Launches Chrome with CDP</text>
+      <text x="12" y="104" class="node-desc">• Port 9222 + persistent profile</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 240 95 L 265 95" class="wire"/>
+
+    <!-- Node 2: Get Application Page -->
+    <g transform="translate(270, 35)">
+      <rect width="220" height="120" rx="10" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.3"/>
+      <rect x="12" y="12" width="80" height="18" rx="4" fill="#7c3aed"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">PLAYWRIGHT</text>
+      <text x="12" y="48" class="node-title">Get Application Page</text>
+      <text x="12" y="68" class="node-desc">node agent.mjs &lt;job_url&gt;</text>
+      <text x="12" y="86" class="node-desc">• Auto-scrolls lazy loading</text>
+      <text x="12" y="104" class="node-desc">• Clicks 'Show more' sections</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 490 95 L 515 95" class="wire"/>
+
+    <!-- Node 3: Read Disk File -->
+    <g transform="translate(520, 35)">
+      <rect width="205" height="120" rx="10" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.3"/>
+      <rect x="12" y="12" width="65" height="18" rx="4" fill="#6d28d9"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">DISK I/O</text>
+      <text x="12" y="48" class="node-title">Read Scraped Output</text>
+      <text x="12" y="68" class="node-desc">Reads dummy-output.txt</text>
+      <text x="12" y="86" class="node-desc">• Captures raw outerHTML</text>
+      <text x="12" y="104" class="node-desc">• Checks payload validity</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 725 95 L 750 95" class="wire"/>
+
+    <!-- Node 4: Prepare Item Data -->
+    <g transform="translate(755, 35)">
+      <rect width="200" height="120" rx="10" fill="#1e1b4b" stroke="#a855f7" stroke-width="1.3"/>
+      <rect x="12" y="12" width="60" height="18" rx="4" fill="#7c3aed"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">JS CODE</text>
+      <text x="12" y="48" class="node-title">Prepare Item Data</text>
+      <text x="12" y="68" class="node-desc">• Cleans tags/scripts/css</text>
+      <text x="12" y="86" class="node-desc">• Builds LinkedIn recruiter</text>
+      <text x="12" y="104" class="node-desc">  &amp; employee search links</text>
+    </g>
+  </g>
+
+  <!-- Wire Stage 1 -> Stage 2 -->
+  <path d="M 550 610 L 550 645" class="wire"/>
+
+  <!-- ================= STAGE 2: CODEX-LB AI ================= -->
+  <g transform="translate(60, 645)">
+    <rect x="0" y="0" width="980" height="175" rx="14" fill="#0d241d" stroke="#059669" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <!-- Stage Badge -->
+    <rect x="20" y="-12" width="280" height="26" rx="6" fill="url(#gradStage2)"/>
+    <text x="32" y="5" class="stage-title">STAGE 2: CODEX-LB AI EVALUATION</text>
+
+    <!-- Node 1: Codex-lb HTTP -->
+    <g transform="translate(30, 32)">
+      <rect width="440" height="115" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="1.3"/>
+      <rect x="15" y="12" width="90" height="18" rx="4" fill="#047857"/>
+      <text x="21" y="24" class="node-tag" fill="#ffffff">HTTP REQUEST</text>
+      <text x="15" y="48" class="node-title">Codex-lb - Analyze Job (Port 2455)</text>
+      <text x="15" y="68" class="node-desc">• Multi-account load balancer (pools free/paid ChatGPT accounts)</text>
+      <text x="15" y="86" class="node-desc">• Runs GPT-5.6-Luna model with deep reasoning</text>
+      <text x="15" y="104" class="node-desc">• Evaluates 100-point rubric, extracts facts, tailors LaTeX resume</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 470 90 L 510 90" class="wire"/>
+
+    <!-- Node 2: Parse + Validate -->
+    <g transform="translate(515, 32)">
+      <rect width="435" height="115" rx="10" fill="#064e3b" stroke="#34d399" stroke-width="1.3"/>
+      <rect x="15" y="12" width="60" height="18" rx="4" fill="#047857"/>
+      <text x="21" y="24" class="node-tag" fill="#ffffff">JS CODE</text>
+      <text x="15" y="48" class="node-title">Parse + Validate Codex Response</text>
+      <text x="15" y="68" class="node-desc">• Bracket-counting parser strips ```markdown codeblocks</text>
+      <text x="15" y="86" class="node-desc">• Validates matching score (0-100%) &amp; referral msg (&lt;500 chars)</text>
+      <text x="15" y="104" class="node-desc">• Ensures complete LaTeX structure (\documentclass ... \end{document})</text>
+    </g>
+  </g>
+
+  <!-- Wire Stage 2 -> Stage 3 -->
+  <path d="M 550 820 L 550 855" class="wire"/>
+
+  <!-- ================= STAGE 3: RESUME COMPILATION ================= -->
+  <g transform="translate(60, 855)">
+    <rect x="0" y="0" width="980" height="190" rx="14" fill="#24190c" stroke="#d97706" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <!-- Stage Badge -->
+    <rect x="20" y="-12" width="310" height="26" rx="6" fill="url(#gradStage3)"/>
+    <text x="32" y="5" class="stage-title">STAGE 3: RESUME PDF &amp; METADATA</text>
+
+    <!-- Node 1: Prepare Resume File -->
+    <g transform="translate(20, 35)">
+      <rect width="170" height="120" rx="10" fill="#451a03" stroke="#fbbf24" stroke-width="1.3"/>
+      <rect x="10" y="12" width="60" height="18" rx="4" fill="#b45309"/>
+      <text x="16" y="24" class="node-tag" fill="#ffffff">JS CODE</text>
+      <text x="10" y="48" class="node-title">Prepare File</text>
+      <text x="10" y="68" class="node-desc">Sets resume basename:</text>
+      <text x="10" y="86" class="node-desc">Alex_Resume_</text>
+      <text x="10" y="104" class="node-desc">&lt;Company&gt;_&lt;SNo&gt;</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 190 95 L 210 95" class="wire"/>
+
+    <!-- Node 2: Write LaTeX -->
+    <g transform="translate(215, 35)">
+      <rect width="175" height="120" rx="10" fill="#451a03" stroke="#fbbf24" stroke-width="1.3"/>
+      <rect x="10" y="12" width="60" height="18" rx="4" fill="#b45309"/>
+      <text x="16" y="24" class="node-tag" fill="#ffffff">FILE I/O</text>
+      <text x="10" y="48" class="node-title">Write LaTeX File</text>
+      <text x="10" y="68" class="node-desc">Writes tailored</text>
+      <text x="10" y="86" class="node-desc">LaTeX string to:</text>
+      <text x="10" y="104" class="node-desc">resume/resume.tex</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 390 95 L 410 95" class="wire"/>
+
+    <!-- Node 3: pdflatex -->
+    <g transform="translate(415, 35)">
+      <rect width="180" height="120" rx="10" fill="#451a03" stroke="#fbbf24" stroke-width="1.3"/>
+      <rect x="10" y="12" width="70" height="18" rx="4" fill="#b45309"/>
+      <text x="16" y="24" class="node-tag" fill="#ffffff">EXEC CMD</text>
+      <text x="10" y="48" class="node-title">LaTeX to PDF</text>
+      <text x="10" y="68" class="node-desc">pdflatex compilation</text>
+      <text x="10" y="86" class="node-desc">• Output directory: resume/</text>
+      <text x="10" y="104" class="node-desc">• Creates resume.pdf</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 595 95 L 615 95" class="wire"/>
+
+    <!-- Node 4: ExifTool -->
+    <g transform="translate(620, 35)">
+      <rect width="185" height="120" rx="10" fill="#451a03" stroke="#fbbf24" stroke-width="1.3"/>
+      <rect x="10" y="12" width="65" height="18" rx="4" fill="#b45309"/>
+      <text x="16" y="24" class="node-tag" fill="#ffffff">EXIFTOOL</text>
+      <text x="10" y="48" class="node-title">Add Metadata</text>
+      <text x="10" y="68" class="node-desc">Embeds prompt into</text>
+      <text x="10" y="86" class="node-desc">PDF Subject:</text>
+      <text x="10" y="104" class="node-desc">"Accept if score &gt; 70"</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 805 95 L 825 95" class="wire"/>
+
+    <!-- Node 5: Read PDF -->
+    <g transform="translate(830, 35)">
+      <rect width="130" height="120" rx="10" fill="#451a03" stroke="#fbbf24" stroke-width="1.3"/>
+      <rect x="10" y="12" width="60" height="18" rx="4" fill="#b45309"/>
+      <text x="16" y="24" class="node-tag" fill="#ffffff">READ I/O</text>
+      <text x="10" y="48" class="node-title">Read PDF</text>
+      <text x="10" y="68" class="node-desc">Loads tagged</text>
+      <text x="10" y="86" class="node-desc">resume.pdf</text>
+      <text x="10" y="104" class="node-desc">into n8n buffer</text>
+    </g>
+  </g>
+
+  <!-- Wire Stage 3 -> Stage 4 -->
+  <path d="M 550 1045 L 550 1080" class="wire"/>
+
+  <!-- ================= STAGE 4: CLOUD STORAGE & TRACKING ================= -->
+  <g transform="translate(60, 1080)">
+    <rect x="0" y="0" width="980" height="185" rx="14" fill="#240e1b" stroke="#e11d48" stroke-width="1.8" filter="url(#cardShadow)"/>
+    <!-- Stage Badge -->
+    <rect x="20" y="-12" width="310" height="26" rx="6" fill="url(#gradStage4)"/>
+    <text x="32" y="5" class="stage-title">STAGE 4: STORAGE &amp; SPREADSHEET</text>
+
+    <!-- Node 1: Google Drive -->
+    <g transform="translate(20, 35)">
+      <rect width="220" height="115" rx="10" fill="#4c0519" stroke="#fb7185" stroke-width="1.3"/>
+      <rect x="12" y="12" width="95" height="18" rx="4" fill="#be123c"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">GOOGLE DRIVE</text>
+      <text x="12" y="48" class="node-title">Google Drive Upload</text>
+      <text x="12" y="68" class="node-desc">Uploads to 'Tailored Resumes'</text>
+      <text x="12" y="86" class="node-desc">Filename: Name_Company_Role.pdf</text>
+      <text x="12" y="104" class="node-desc">Returns webViewLink</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 240 92 L 265 92" class="wire"/>
+
+    <!-- Node 2: Build Final Row -->
+    <g transform="translate(270, 35)">
+      <rect width="215" height="115" rx="10" fill="#4c0519" stroke="#fb7185" stroke-width="1.3"/>
+      <rect x="12" y="12" width="60" height="18" rx="4" fill="#be123c"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">JS CODE</text>
+      <text x="12" y="48" class="node-title">Build Final Sheet Row</text>
+      <text x="12" y="68" class="node-desc">Combines 22 columns:</text>
+      <text x="12" y="86" class="node-desc">Match %, Missing Skills, Reason,</text>
+      <text x="12" y="104" class="node-desc">Referral Msg, Drive Resume Link</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 485 92 L 510 92" class="wire"/>
+
+    <!-- Node 3: Append Row -->
+    <g transform="translate(515, 35)">
+      <rect width="215" height="115" rx="10" fill="#4c0519" stroke="#fb7185" stroke-width="1.3"/>
+      <rect x="12" y="12" width="95" height="18" rx="4" fill="#be123c"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">GOOGLE SHEET</text>
+      <text x="12" y="48" class="node-title">Append Sheet Row</text>
+      <text x="12" y="68" class="node-desc">Appends new row to</text>
+      <text x="12" y="86" class="node-desc">'Job Tracker' spreadsheet</text>
+      <text x="12" y="104" class="node-desc">Initial status: 'Not Applied'</text>
+    </g>
+
+    <!-- Arrow -->
+    <path d="M 730 92 L 755 92" class="wire"/>
+
+    <!-- Node 4: Webhook Apps Script -->
+    <g transform="translate(760, 35)">
+      <rect width="195" height="115" rx="10" fill="#4c0519" stroke="#fb7185" stroke-width="1.3"/>
+      <rect x="12" y="12" width="85" height="18" rx="4" fill="#be123c"/>
+      <text x="18" y="24" class="node-tag" fill="#ffffff">APPS SCRIPT</text>
+      <text x="12" y="48" class="node-title">Format Rich Text</text>
+      <text x="12" y="68" class="node-desc">Triggers doPost webhook</text>
+      <text x="12" y="86" class="node-desc">Transforms raw lead strings</text>
+      <text x="12" y="104" class="node-desc">into clickable hyperlinks</text>
+    </g>
+  </g>
+
+  <!-- ================= RETURN LOOP WIRE ================= -->
+  <!-- From Format Rich Text back up to Loop Over Items -->
+  <path d="M 855 1265 L 855 1310 L 1060 1310 L 1060 355 L 720 355" class="wire-loop"/>
+
+  <!-- Loop Label Box -->
+  <g transform="translate(870, 1295)">
+    <rect width="160" height="28" rx="6" fill="#0f172a" stroke="#38bdf8" stroke-width="1.2"/>
+    <text x="12" y="18" font-family="'Segoe UI', sans-serif" font-weight="600" font-size="11.5" fill="#38bdf8">🔁 Next Job Item Loop</text>
+  </g>
+
+  <!-- ================= FOOTER / STATS ================= -->
+  <g transform="translate(60, 1370)">
+    <rect width="980" height="190" rx="12" fill="#131c2e" stroke="#334155" stroke-width="1.4"/>
+    <text x="30" y="38" font-family="'Segoe UI', sans-serif" font-weight="700" font-size="16" fill="#ffffff">🎯 Automation Highlights &amp; Safeguards</text>
+    
+    <g transform="translate(30, 60)">
+      <text x="0" y="15" font-family="'Segoe UI', sans-serif" font-weight="600" font-size="13" fill="#38bdf8">🛡️ Anti-Hallucination Guard</text>
+      <text x="0" y="35" class="node-desc" font-size="12">Master resume is the ONLY authoritative source for facts. Never invents skills, companies, metrics, or credentials.</text>
+
+      <text x="0" y="65" font-family="'Segoe UI', sans-serif" font-weight="600" font-size="13" fill="#a855f7">🔄 Multi-Account Load Balancing</text>
+      <text x="0" y="85" class="node-desc" font-size="12">Codex-lb pools multiple ChatGPT accounts under a single key. Free tier accounts can be chained to avoid rate limits.</text>
+
+      <text x="510" y="15" font-family="'Segoe UI', sans-serif" font-weight="600" font-size="13" fill="#fbbf24">🎯 ExifTool ATS Prompt Injection</text>
+      <text x="510" y="35" class="node-desc" font-size="12">Injects directive metadata into the PDF Subject property to instruct automated ATS LLM scanners.</text>
+
+      <text x="510" y="65" font-family="'Segoe UI', sans-serif" font-weight="600" font-size="13" fill="#f43f5e">⚡ Zero Human Work for 50+ Apps</text>
+      <text x="510" y="85" class="node-desc" font-size="12">Single click processes all target jobs, builds custom resumes, extracts salary/skills, and gathers LinkedIn leads.</text>
+    </g>
+  </g>
+</svg>

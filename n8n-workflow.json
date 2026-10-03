@@ -526,7 +526,68 @@
     "Loop Over Items": {
       "main": [
         [],
-        []
+        [
+          {
+            "node": "Start Debug Chrome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start Debug Chrome": {
+      "main": [
+        [
+          {
+            "node": "Get Application Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Application Page": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write LaTeX File": {
+      "main": [
+        [
+          {
+            "node": "LaTeX to PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LaTeX to PDF": {
+      "main": [
+        [
+          {
+            "node": "Add Meta Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add Meta Data": {
+      "main": [
+        [
+          {
+            "node": "Read PDF",
+            "type": "main",
+            "index": 0
+          }
+        ]
       ]
     }
   },
@@ -535,7 +596,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "f240592c-5ff7-42a0-98fc-c69a0e558231",
+  "versionId": "e0eddf1f-0f6e-4a05-b72a-5625d46ad4b9",
   "meta": {
     "instanceId": "64cc35ae59e6163b08bff4e032f61c8c91deeb670455e4eafac25a25b38771a1"
   },
