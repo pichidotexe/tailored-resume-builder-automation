@@ -1,7 +1,7 @@
 import { spawn } from 'node:child_process';
 import http from 'node:http';
 
-const CHROME = 'EXECUTABLE PATH';
+const CHROME = 'chrome';
 
 const PROFILE = 'CHROME PROFILE';
 
