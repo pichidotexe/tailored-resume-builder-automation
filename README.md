@@ -184,6 +184,7 @@ By default, n8n disables dangerous nodes like `Execute Command` and file read/wr
 | `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS` | `true` | Prevents config permission errors on Windows |
 | `N8N_ENABLE_EXECUTE_COMMAND` | `true` | **Critical:** enables the Execute Command node |
 | `NODES_EXCLUDE` | `[]` | Ensures all built-in nodes (file operations etc.) are enabled |
+| `N8N_RESTRICT_FILE_ACCESS_TO` | `""` | Prevents File Access errors |
 
 4. Restart PowerShell after setting variables.
 
@@ -192,6 +193,7 @@ By default, n8n disables dangerous nodes like `Execute Command` and file read/wr
 > $env:N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS="true"
 > $env:N8N_ENABLE_EXECUTE_COMMAND="true"
 > $env:NODES_EXCLUDE="[]"
+> $env:N8N_RESTRICT_FILE_ACCESS_TO=""
 > npx n8n
 > ```
 

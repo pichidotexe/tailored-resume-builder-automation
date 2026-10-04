@@ -3,7 +3,7 @@ import http from 'node:http';
 
 const CHROME = 'chrome';
 
-const PROFILE = 'CHROME PROFILE';
+const PROFILE = 'R:\\Pichi Dot EXE\\projects\\tailored-resume-creator-automation\\browser-agent\\chrome-profile';
 
 const CDP_URL = 'http://127.0.0.1:9222/json/version';
 
