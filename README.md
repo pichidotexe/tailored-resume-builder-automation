@@ -416,7 +416,7 @@ const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 **Line 6** — set the Chrome profile directory:
 ```javascript
 // Replace with the absolute path to the chrome-profile folder inside browser-agent/
-const PROFILE = 'R:\\Pichi Dot EXE\\projects\\tailored-resume-creator-automation\\browser-agent\\chrome-profile';
+const PROFILE = 'absolute path to the chrome-profile';
 ```
 
 > ⚠️ **Windows paths in JavaScript:** use double backslashes (`\\`) or forward slashes (`/`).
