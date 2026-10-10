@@ -10,16 +10,15 @@
 2. [🌟 What Does This Project Do?](#-what-does-this-project-do)
 3. [🏗️ How It Works](#️-how-it-works)
 4. [📋 Prerequisites](#-prerequisites)
-5. [🛠️ Step 1: Install Node.js, Python, and uv](#️-step-1-install-nodejs-python-and-uv)
-6. [🤖 Step 2: Install & Configure n8n](#-step-2-install--configure-n8n)
-7. [☁️ Step 3: GCP Console — Create Credentials for Sheets & Drive](#️-step-3-gcp-console--create-credentials-for-sheets--drive)
-8. [📊 Step 4: Google Sheets Setup (incl. App Script Deployment)](#-step-4-google-sheets-setup-incl-app-script-deployment)
-9. [📄 Step 5: Install LaTeX & ExifTool — Add to System PATH](#-step-5-install-latex--exiftool--add-to-system-path)
-10. [🌐 Step 6: Configure the Chrome Browser Agent](#-step-6-configure-the-chrome-browser-agent)
-11. [⚙️ Step 7: Import & Configure the n8n Workflow](#️-step-7-import--configure-the-n8n-workflow)
-12. [▶️ Step 8: Sample Run](#️-step-8-sample-run)
-13. [❓ Step 9: FAQs & Troubleshooting](#-step-9-faqs--troubleshooting)
-14. [✅ Pre-Flight Checklist](#-pre-flight-checklist)
+5. [🍴 Step 1: Fork & Clone the Repository](#-step-1-fork--clone-the-repository)
+6. [🛠️ Step 2: Install Node.js, Python, uv, n8n, LaTeX, ExifTool & Codex-lb](#️-step-2-install-nodejs-python-uv-n8n-latex-exiftool--codex-lb)
+7. [🌐 Step 3: Set All Environment Variables (n8n, ExifTool, Chrome)](#-step-3-set-all-environment-variables-n8n-exiftool-chrome)
+8. [🕵️ Step 4: Configure the Chrome Browser Agent](#️-step-4-configure-the-chrome-browser-agent)
+9. [🔐 Step 5: Configure Credentials (GCP Console, Google Sheets & Drive, Codex-lb API Key)](#-step-5-configure-credentials-gcp-console-google-sheets--drive-codex-lb-api-key)
+10. [⚙️ Step 6: Import & Configure the n8n Workflow](#️-step-6-import--configure-the-n8n-workflow)
+11. [▶️ Step 7: Sample Run](#️-step-7-sample-run)
+12. [❓ Step 8: FAQs & Troubleshooting](#-step-8-faqs--troubleshooting)
+13. [✅ Pre-Flight Checklist](#-pre-flight-checklist)
 
 ---
 
@@ -85,7 +84,7 @@ Here is the exact journey each job takes through the pipeline:
 | 3 | `Start Debug Chrome` | Launches Chrome in CDP debug mode on port 9222 |
 | 4 | `Get Application Page` | Runs `agent.mjs` via Playwright CDP to scrape the full job description |
 | 5 | `Read/Write Files from Disk` | Reads the scraped output from `dummy-output.txt` |
-| 6 | `Codex-lb — Analyze Job` | Sends job + resume to AI; gets score, keywords, tailored LaTeX back |
+| 6 | `Codex-lb — Analyze Job` | Sends job + resume to AI via Codex-lb Bearer Token; gets score, keywords, tailored LaTeX back |
 | 7 | `Prepare Resume File` | Extracts values; names the output file `YourName_Company_Role.pdf` |
 | 8 | `Write LaTeX File` | Saves the tailored `.tex` to the `resume/` folder |
 | 9 | `LaTeX to PDF` | Runs `pdflatex` to compile `resume.pdf` |
@@ -103,196 +102,296 @@ Make sure every item below is in place **before** starting the setup steps.
 
 | Component | Tool / Software | Required For |
 | :--- | :--- | :--- |
+| **Git** | git-scm.com | Cloning and version controlling the repository |
 | **Node.js (v18+)** | nodejs.org | Running n8n & the browser agent |
 | **Python (v3.10+)** | python.org | Running `uv` and helper tools |
-| **uv** | Astral uv (`uvx`) | Running `codex-lb` without manual venvs |
-| **n8n** | n8n workflow engine | Main automation workflow |
-| **Codex-lb** | `uvx codex-lb` | Pooling multiple ChatGPT accounts for high-rate AI |
-| **Google Chrome** | Chrome browser | Real browser session for Playwright CDP |
+| **uv** | Astral uv (`uvx`) | Running `codex-lb` without manual virtual environments |
+| **n8n** | n8n workflow engine | Main automation workflow orchestration |
+| **Codex-lb** | `uvx codex-lb` | Pooling multiple ChatGPT accounts for high-rate AI generation |
+| **Google Chrome** | Chrome browser | Real browser session for Playwright CDP scraping |
 | **pdflatex** | MiKTeX or TeX Live | Compiling LaTeX resumes to PDF |
 | **ExifTool** | Phil Harvey's ExifTool | Injecting metadata into the PDF |
-| **GCP Project** | Google Cloud Console | OAuth credentials for Google Sheets & Drive |
+| **GCP Project** | Google Cloud Console | OAuth credentials for Google Sheets & Drive APIs |
 
 ---
 
-## 🛠️ Step 1: Install Node.js, Python, and uv
+## 🍴 Step 1: Fork & Clone the Repository
+
+### 1. Fork this repository
+1. Go to this repository on GitHub.
+2. Click the **Fork** button in the top-right corner.
+3. Select your GitHub profile/organization to create your own copy.
+
+### 2. Clone it to your local machine
+Open your terminal (PowerShell or Bash) and clone your fork:
+
+```powershell
+git clone https://github.com/<your-username>/tailored-resume-builder-automation.git
+cd tailored-resume-builder-automation
+```
+
+---
+
+## 🛠️ Step 2: Install Node.js, Python, uv, n8n, LaTeX, ExifTool & Codex-lb
 
 ### 1. Install Node.js (v18 or v20 LTS)
-
-1. Download Node.js from [nodejs.org](https://nodejs.org/).
-2. Run the installer and check **"Automatically install the necessary tools"**.
-3. Verify in PowerShell:
+1. Download Node.js LTS from [nodejs.org](https://nodejs.org/) or install via WinGet:
+   ```powershell
+   winget install OpenJS.NodeJS.LTS
+   ```
+2. Verify in PowerShell:
    ```powershell
    node -v
    npm -v
    ```
 
 ### 2. Install Python (v3.10+)
-
-1. Download from [python.org](https://www.python.org/) or run:
+1. Download from [python.org](https://www.python.org/) or install via WinGet:
    ```powershell
    winget install Python.Python.3.12
    ```
-2. ⚠️ Check **"Add python.exe to PATH"** during setup!
+2. ⚠️ **Critical:** Make sure **"Add python.exe to PATH"** is checked during setup!
 3. Verify:
    ```powershell
    python --version
    ```
 
 ### 3. Install `uv` (Fast Python Package Runner)
-
-`uv` is required to run `uvx codex-lb` without manually managing virtual environments:
+`uv` allows running `codex-lb` instantly with `uvx` without needing manual virtual environments:
 
 ```powershell
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
 Or via WinGet:
-
 ```powershell
 winget install --id=astral-sh.uv
 ```
 
 Verify:
-
 ```powershell
 uv --version
 ```
 
----
+### 4. Install n8n Globally & Set Up Local Account
+1. Install n8n globally using npm:
+   ```powershell
+   npm install -g n8n
+   ```
+2. Start n8n:
+   ```powershell
+   n8n start
+   ```
+3. Open your browser and navigate to: 👉 **`http://localhost:5678`**
+4. **Login locally using email and password:**
+   - On the first run, n8n will prompt you to set up the owner account.
+   - Enter your **Email address**, **First name**, **Last name**, and a secure **Password**.
+   - Complete the setup to access the n8n dashboard.
+   - *(Keep this n8n instance or leave this terminal ready for later steps).*
 
-## 🤖 Step 2: Install & Configure n8n
+### 5. Install LaTeX (pdflatex via MiKTeX)
+LaTeX compiles your tailored resume into a clean, pixel-perfect PDF.
 
-### Install n8n globally
+1. Download **MiKTeX** from [miktex.org/download](https://miktex.org/download) or run:
+   ```powershell
+   winget install MiKTeX.MiKTeX
+   ```
+2. During installation, when prompted **"Install missing packages on-the-fly"** → select **Yes**.
+3. Restart your PowerShell window and verify:
+   ```powershell
+   pdflatex --version
+   ```
+
+### 6. Install ExifTool
+ExifTool injects ATS-optimisation metadata directly into the PDF `Subject` field.
+
+1. Download the Windows executable from [exiftool.org](https://exiftool.org/).
+2. Extract the `.zip` file. You will find `exiftool(-k).exe`.
+3. **Rename it to `exiftool.exe`** (remove `(-k)`).
+4. Move `exiftool.exe` to a permanent folder, e.g. `C:\Tools\`.
+
+### 7. Run `codex-lb`
+`codex-lb` runs an AI load-balancer that manages multiple ChatGPT accounts and exposes an OpenAI-compatible API on port `2455`:
 
 ```powershell
-npm install -g n8n
+uvx codex-lb
 ```
 
-### Set Required Environment Variables
+This will automatically download and start `codex-lb` immediately. It will listen on **`http://127.0.0.1:2455`**. Keep this terminal running!
 
-By default, n8n disables dangerous nodes like `Execute Command` and file read/write. Because this workflow runs `pdflatex`, `exiftool`, and `node` via shell commands, **these must be explicitly enabled**.
+---
 
-#### Set permanently in Windows:
+## 🌐 Step 3: Set All Environment Variables (n8n, ExifTool, Chrome)
 
-1. Press `Win + R`, type `sysdm.cpl`, press **Enter**.
-2. Go to the **Advanced** tab → **Environment Variables**.
-3. Under **User variables**, click **New** and add each variable below:
+By default, n8n disables dangerous nodes like `Execute Command` and file read/write operations. Because this workflow executes `pdflatex`, `exiftool`, and `node` scripts directly, these permissions must be explicitly enabled. Additionally, `exiftool` and `chrome` should be accessible on your system PATH.
+
+### 1. Set n8n Environment Variables
+Add the following user/system environment variables:
 
 | Variable Name | Value | Purpose |
 | :--- | :--- | :--- |
-| `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS` | `true` | Prevents config permission errors on Windows |
-| `N8N_ENABLE_EXECUTE_COMMAND` | `true` | **Critical:** enables the Execute Command node |
-| `NODES_EXCLUDE` | `[]` | Ensures all built-in nodes (file operations etc.) are enabled |
-| `N8N_RESTRICT_FILE_ACCESS_TO` | `""` | Prevents File Access errors |
+| `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS` | `true` | Prevents file permission conflicts on Windows |
+| `N8N_ENABLE_EXECUTE_COMMAND` | `true` | **Critical:** Enables the Execute Command node in n8n |
+| `NODES_EXCLUDE` | `[]` | Ensures all built-in filesystem nodes remain enabled |
+| `N8N_RESTRICT_FILE_ACCESS_TO` | `""` | Prevents disk read/write restriction errors |
 
-4. Restart PowerShell after setting variables.
+#### To set them permanently in Windows GUI:
+1. Press `Win + R`, type `sysdm.cpl`, and press **Enter**.
+2. Go to the **Advanced** tab → click **Environment Variables**.
+3. Under **User variables** (or System variables), click **New** and add each variable above.
 
-> 💡 **Quick alternative** — set variables inline for a single session:
-> ```powershell
-> $env:N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS="true"
-> $env:N8N_ENABLE_EXECUTE_COMMAND="true"
-> $env:NODES_EXCLUDE="[]"
-> $env:N8N_RESTRICT_FILE_ACCESS_TO=""
-> npx n8n
-> ```
-
-### Start n8n
-
+#### Or set them inline in PowerShell for your session:
 ```powershell
-n8n start
+$env:N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS="true"
+$env:N8N_ENABLE_EXECUTE_COMMAND="true"
+$env:NODES_EXCLUDE="[]"
+$env:N8N_RESTRICT_FILE_ACCESS_TO=""
 ```
 
-Open your browser and go to: 👉 **`http://localhost:5678`**
+### 2. Add ExifTool to System PATH
+1. In the **Environment Variables** window (`sysdm.cpl`), locate `Path` under **System variables** → click **Edit**.
+2. Click **New** → add `C:\Tools` (where `exiftool.exe` is saved).
+3. Click **OK** to save.
+4. Restart PowerShell and verify:
+   ```powershell
+   exiftool -ver
+   ```
 
-Create your owner account when prompted.
+### 3. Add Chrome to System PATH
+Adding Chrome allows the browser agent and automation to launch Chrome using `chrome`:
+1. Find your Chrome executable directory:
+   - Typically: `C:\Program Files\Google\Chrome\Application\`
+   - Check in Chrome by going to `chrome://version/` → **Executable Path**.
+2. Add `C:\Program Files\Google\Chrome\Application\` to your `Path` variable.
+3. Restart PowerShell and verify:
+   ```powershell
+   chrome --version
+   ```
 
 ---
 
-## ☁️ Step 3: GCP Console — Create Credentials for Sheets & Drive
+## 🕵️ Step 4: Configure the Chrome Browser Agent
 
-n8n connects to Google Sheets and Google Drive using **OAuth 2.0**. You need a GCP project with a **Client ID** and **Client Secret** — these are what n8n asks for when you add a Google credential.
+The browser agent utilizes Playwright connected via **Chrome DevTools Protocol (CDP)** on port `9222`. This handles JavaScript-heavy Single Page Applications (Workday, Greenhouse, Lever, LinkedIn), auto-expands "Show more" sections, and bypasses anti-bot hurdles.
 
-### 3.1 Create a GCP Project
+### 1. Set Chrome Path & Profile in `start-debug-chrome.mjs`
+Open `browser-agent/start-debug-chrome.mjs`:
 
-1. Go to [console.cloud.google.com](https://console.cloud.google.com/).
-2. Click the project dropdown (top-left) → **New Project**.
-3. Give it a name (e.g. `n8n-resume-automation`) and click **Create**.
-4. Make sure the new project is selected in the dropdown.
+**Line 6** — Set the Chrome profile directory (absolute path to `chrome-profile` inside `browser-agent/`):
+```javascript
+// Replace with the absolute path to your browser-agent/chrome-profile folder
+const PROFILE = 'ABSOLUTE PATH OF CHROME PROFILE FOLDER';
+```
+> ⚠️ **Note:** In JavaScript strings on Windows, use escaped backslashes (`\\`) or forward slashes (`/`).
 
-### 3.2 Enable the Required APIs
+### 2. Install Browser Agent Dependencies
+Open PowerShell inside the `browser-agent/` directory:
 
-1. In the left sidebar, go to **APIs & Services** → **Library**.
-2. Search for and enable each of the following:
-   - **Google Sheets API** → click it → **Enable**
-   - **Google Drive API** → click it → **Enable**
+```powershell
+cd browser-agent
+npm install
+```
 
-### 3.3 Configure the OAuth Consent Screen
-
-Before creating credentials, you must set up the consent screen Google shows when users authorise the app.
-
-1. Go to **APIs & Services** → **OAuth consent screen**.
-2. Select **External** → click **Create**.
-3. Fill in:
-   - **App name:** `n8n Resume Automation`
-   - **User support email:** your Gmail address
-   - **Developer contact information:** your Gmail address
-4. Click **Save and Continue** through the Scopes and Test Users screens (no changes needed for personal use).
-5. Back on the summary screen, either click **Publish App** or leave it in Testing and add your Gmail as a test user.
-
-### 3.4 Create OAuth 2.0 Client Credentials
-
-1. Go to **APIs & Services** → **Credentials**.
-2. Click **+ Create Credentials** → **OAuth client ID**.
-3. Set **Application type** to **Web application**.
-4. Give it a name (e.g. `n8n OAuth Client`).
-5. Under **Authorised redirect URIs**, click **+ Add URI** and enter:
+### 3. Test the Browser Agent
+1. Launch debug Chrome:
+   ```powershell
+   node start-debug-chrome.mjs
    ```
-   http://localhost:5678/rest/oauth2-credential/callback
+   Expected output: `Chrome CDP ready after 1 second(s).`
+2. Test scraping a job link:
+   ```powershell
+   node agent.mjs "https://www.google.com" > dummy-output.txt
    ```
-   > ⚠️ This is the exact callback URL n8n uses. Without it, the OAuth flow will fail.
-6. Click **Create**.
-7. A dialog appears — **copy and save both values:**
-   - **Client ID** (e.g. `123456789-abc...apps.googleusercontent.com`)
-   - **Client Secret** (e.g. `GOCSPX-...`)
-
-### 3.5 Add Google Sheets Credential in n8n
-
-1. In n8n, go to **Settings** → **Credentials** → **Add credential**.
-2. Search for **Google Sheets OAuth2 API** and select it.
-3. Paste your **Client ID** and **Client Secret**.
-4. Click **Sign in with Google** — a browser popup will ask you to authorise.
-5. Grant all requested permissions. Credential status → ✅ **Connected**.
-
-### 3.6 Add Google Drive Credential in n8n
-
-Repeat the same process for Drive:
-
-1. **Add credential** → search for **Google Drive OAuth2 API**.
-2. Paste the **same Client ID and Client Secret** (you can reuse the same OAuth client for both Sheets and Drive).
-3. Click **Sign in with Google** and authorise.
-4. Credential status → ✅ **Connected**.
+3. Check `dummy-output.txt` — it should contain formatted scraped output.
 
 ---
 
-## 📊 Step 4: Google Sheets Setup (incl. App Script Deployment)
+## 🔐 Step 5: Configure Credentials (GCP Console, Google Sheets & Drive, Codex-lb API Key)
 
-You need two Google Sheets and one Google Drive folder.
+### 5.1 Start n8n & Open Credentials Tab
+1. Ensure n8n is running (`n8n start`).
+2. Open `http://localhost:5678` in your browser.
+3. On the left sidebar, click **Credentials**.
 
-### 4.1 Input Sheet: "Job Links"
+---
 
-Create a Google Sheet named **Job Links** with this exact header row in row 1:
+### 5.2 Set Up GCP Console (Google Sheets & Drive OAuth)
+1. **Open GCP Console:** Go to [console.cloud.google.com](https://console.cloud.google.com/).
+2. **Create Project:** Click the project dropdown (top-left) → **New Project** → name it `n8n-resume-automation` → click **Create**. Ensure it is selected.
+3. **Configure OAuth Consent Screen:**
+   - Go to **APIs & Services** → **OAuth consent screen**.
+   - Choose **External** → click **Create**.
+   - Fill in:
+     - **App name:** `n8n Resume Automation`
+     - **User support email:** Your Gmail address
+     - **Developer contact information:** Your Gmail address
+   - Click **Save and Continue**.
+   - Under **Test Users / Audience:** Click **+ Add Users** → enter your Gmail address → click **Save and Continue**.
+4. **Enable APIs:**
+   - In GCP Console, go to **APIs & Services** → **Library**.
+   - Search for **Google Sheets API** → click **Enable**.
+   - Search for **Google Drive API** → click **Enable**.
+5. **Create OAuth 2.0 Credentials:**
+   - Go to **APIs & Services** → **Credentials** → click **+ Create Credentials** → **OAuth client ID**.
+   - Set **Application type** to **Web application**.
+   - Name it `n8n OAuth Client`.
+   - Under **Authorised redirect URIs**, click **+ Add URI**.
+   - Enter n8n's redirect URL:
+     ```
+     http://localhost:5678/rest/oauth2-credential/callback
+     ```
+   - Click **Create**.
+   - A modal pop-up will display your **Client ID** and **Client Secret**, with an option to download the credentials JSON file. Download the JSON or copy both credentials.
+
+---
+
+### 5.3 Connect Google Sheets & Drive Credentials in n8n
+1. **Add Google Sheets Credential:**
+   - In n8n (`http://localhost:5678`), go to **Credentials** → **Add Credential**.
+   - Search for **Google Sheets OAuth2 API**.
+   - Paste your **Client ID** and **Client Secret**.
+   - Click **Sign in with Google** → a Google authorization window pops up.
+   - Select your Google account and grant permissions until the status displays ✅ **Connected**.
+2. **Add Google Drive Credential:**
+   - In n8n, click **Add Credential** → search for **Google Drive OAuth2 API**.
+   - Paste the same **Client ID** and **Client Secret**.
+   - Click **Sign in with Google** and authorize.
+   - The status will display ✅ **Connected**.
+
+---
+
+### 5.4 Configure Codex-lb Accounts & Create API Key
+1. **Open Codex-lb:** Ensure `uvx codex-lb` is running in your terminal. Open your browser and navigate to the Codex-lb interface at `http://localhost:2455`.
+2. **Add Accounts:**
+   - Navigate to the **Accounts** tab.
+   - Add your ChatGPT account(s). You can add multiple accounts to pool and load balance rate limits.
+3. **Generate an API Key:**
+   - Go to the **API Keys** tab.
+   - Click **Create API Key**, give it any name (e.g. `n8n-tailored-resume`), and generate it.
+   - **Copy the generated API key**.
+4. **Add Codex-lb Bearer Token in n8n:**
+   - Back in n8n, go to **Credentials** → **Add Credential**.
+   - Search for **Header Auth** or **HTTP Bearer Auth** (select **Bearer Token** / **Header Auth**).
+   - In the **Token** / **Key** field, paste the API key you copied from Codex-lb.
+   - Rename this credential to **`codex-lb api key`**.
+   - Click **Save**.
+
+---
+
+### 5.5 Google Sheets Setup & Apps Script Deployment
+You will need an input spreadsheet, an output tracker spreadsheet, and a Google Drive folder.
+
+#### 1. Input Sheet: "Job Links"
+Create a Google Sheet named **Job Links** with this header row in row 1:
 
 | S.No | Company | Role | Application link |
 | :---: | :---: | :---: | :---: |
 | 1 | Stripe | Software Engineer - Backend | https://stripe.com/jobs/... |
-| 2 | Datadog | Frontend Engineer | https://datadog.com/jobs/... |
 
-> 💡 You can also upload the included `Job Links.xlsx` directly to Google Drive and convert it to a Google Sheet.
+*(You can also upload `Job Links.xlsx` directly to Google Drive).*
 
-### 4.2 Output Sheet: "Job Tracker"
-
-Create a Google Sheet named **Job Tracker** with these column headers in row 1:
+#### 2. Output Sheet: "Job Tracker"
+Create a Google Sheet named **Job Tracker** with these headers across columns A–V:
 
 | Col | Header | Description |
 | :---: | :--- | :--- |
@@ -319,387 +418,167 @@ Create a Google Sheet named **Job Tracker** with these column headers in row 1:
 | U | `Follow-up Date` | Auto-stamped for follow-ups |
 | V | `Notes` | Personal application notes |
 
-> 💡 You can also upload `Job Tracker.xlsx` to Google Drive and convert it.
+*(You can also upload `Job Tracker.xlsx` directly to Google Drive).*
 
-### 4.3 Deploy the Google Apps Script Web App
-
-The Apps Script makes the **Referral Leads** column automatically convert raw URLs into clickable "Recruiters" / "Employees" hyperlinks, and auto-stamps applied/follow-up dates when you change status.
-
+#### 3. Deploy Google Apps Script Web App
 1. Open your **Job Tracker** Google Sheet.
-2. In the top menu: **Extensions** → **Apps Script**.
-3. Delete any default code in `Code.gs`.
-4. Copy the entire contents of `Job Tracker App Script.gs` from this repo and paste it in.
-5. Click **Save** (💾).
-6. Click the blue **Deploy** button (top-right) → **New deployment**.
-7. Click the gear icon ⚙️ next to "Select type" → choose **Web app**.
-8. Configure the deployment:
+2. Go to **Extensions** → **Apps Script**.
+3. Replace the code with the contents of `Job Tracker App Script.gs`.
+4. Click **Deploy** → **New deployment**.
+5. Select type: **Web app**.
    - **Description:** `Referral Leads & Status Formatter`
    - **Execute as:** `Me (your-email@gmail.com)`
-   - **Who has access:** `Anyone` *(Critical — this lets n8n call it without extra auth headers)*
-9. Click **Deploy** and authorise Google permissions when prompted.
-10. **Copy the Web App URL** (looks like `https://script.google.com/macros/s/AKfycb.../exec`).
-    Save this URL — you will paste it into n8n in Step 7.
+   - **Who has access:** `Anyone` *(Crucial so n8n can call it without authentication barriers)*
+6. Click **Deploy**, authorise Google permissions, and **copy the Web App URL** (`https://script.google.com/macros/s/.../exec`).
 
-### 4.4 Create the Google Drive Folder
-
+#### 4. Create Google Drive Folder
 1. Go to [drive.google.com](https://drive.google.com/).
-2. Create a new folder named `Tailored Resumes`.
+2. Create a folder named `Tailored Resumes`.
 3. Open the folder and copy its **Folder ID** from the URL:
    `https://drive.google.com/drive/folders/`**`1a2b3c4d5e6f7g8h9i`**
-   (the bold part is your Folder ID — save it for Step 7).
 
 ---
 
-## 📄 Step 5: Install LaTeX & ExifTool — Add to System PATH
+## ⚙️ Step 6: Import & Configure the n8n Workflow
 
-### 5.1 Install pdflatex (MiKTeX)
+### 1. Import Workflow into n8n
+1. In n8n, go to **Workflows** → click **Add Workflow** (or the three dots menu) → **Import from File**.
+2. Select `n8n-workflow.json` from this repository.
 
-LaTeX compiles your tailored resume into a pixel-perfect, ATS-parseable PDF.
+### 2. Replace Placeholders in Nodes
+Find and replace all placeholders with your absolute system paths:
 
-1. Download **MiKTeX** from [miktex.org/download](https://miktex.org/download)
-   *(or: `winget install MiKTeX.MiKTeX`)*
-2. During installation, when asked **"Install missing packages on-the-fly"** → select **Yes**. This prevents compilation failures for missing LaTeX packages.
-3. Restart PowerShell and verify:
-   ```powershell
-   pdflatex --version
-   ```
-   Expected output: `pdfTeX 3.141592653...`
+| Placeholder | Node(s) | Description | Example |
+| :--- | :--- | :--- | :--- |
+| `<NAME>` | `Prepare Resume File`<br>`Google Drive - Upload PDF` | Your name for resume naming | `John_Doe` |
+| `<BROWSER_AGENT_PATH>` | `Get Application Page` | Absolute path to `browser-agent/` directory | `R:\...\browser-agent` |
+| `<START_DEBUG_CHROME_FILE_PATH>` | `Start Debug Chrome` | Absolute path to `start-debug-chrome.mjs` | `R:\...\browser-agent\start-debug-chrome.mjs` |
+| `<DUMMY_OUTPUT_FILE_PATH>` | `Get Application Page`<br>`Read/Write Files from Disk` | Absolute path to `dummy-output.txt` | `R:\...\browser-agent\dummy-output.txt` |
+| `<LOCAL_TEMP_FOLDER_FOR_RESUME>` | `Write LaTeX File`<br>`LaTeX to PDF`<br>`Add Meta Data`<br>`Read PDF` | Absolute path to your local `resume/` directory | `R:\...\tailored-resume-builder-automation\resume` |
 
-> If `pdflatex` is not found after install, add the MiKTeX bin directory to your system PATH:
-> `C:\Users\<YourUsername>\AppData\Local\Programs\MiKTeX\miktex\bin\x64\`
-
-### 5.2 Install ExifTool
-
-ExifTool injects metadata into the generated PDF — specifically an AI prompt into the `Subject` field as an ATS optimisation technique.
-
-1. Download the Windows executable from [exiftool.org](https://exiftool.org/).
-2. Extract the `.zip`. You will find `exiftool(-k).exe`.
-3. **Rename it to `exiftool.exe`** (remove the `(-k)` part).
-4. Move `exiftool.exe` to a permanent folder, e.g. `C:\Tools\`.
-5. Add `C:\Tools` to your Windows **System PATH**:
-   - `Win + R` → `sysdm.cpl` → **Advanced** → **Environment Variables**
-   - Under **System variables**, find `Path` → **Edit** → **New** → type `C:\Tools`
-   - Click **OK** on all dialogs.
-6. Restart PowerShell and verify:
-   ```powershell
-   exiftool -ver
-   ```
-
-### 5.3 Add Chrome to System PATH (Optional but Recommended)
-
-Adding Chrome to PATH lets the browser agent launch Chrome with just `chrome` instead of a full path.
-
-1. Find your Chrome executable path: open Chrome → `chrome://version/` → look for **Executable Path**.
-   Default location: `C:\Program Files\Google\Chrome\Application\`
-2. Add that folder to your system `Path` following the same steps above.
-3. Verify:
-   ```powershell
-   chrome --version
-   ```
+### 3. Connect Node Credentials & Settings
+- **`Static Configuration`**:
+  - `start_sno`: Start row index (e.g. `1`).
+  - `end_sno`: End row index (e.g. `1` for initial test).
+  - `master_resume_latex`: Paste your complete master LaTeX resume code.
+- **`Fetch Job Input Sheet`**:
+  - Select your **Google Sheets OAuth2 API** credential.
+  - Select the `Job Links` spreadsheet and sheet name.
+- **`Codex-lb - Analyze Job`**:
+  - Credential: Select your **`codex-lb api key`** (HTTP Bearer Auth).
+  - URL: `http://127.0.0.1:2455/v1/responses`.
+- **`Google Drive - Upload PDF`**:
+  - Select your **Google Drive OAuth2 API** credential.
+  - Select the `Tailored Resumes` folder (paste your Folder ID).
+- **`Google Sheets - Append Row`**:
+  - Select your **Google Sheets OAuth2 API** credential.
+  - Select the `Job Tracker` spreadsheet.
+- **`Convert Referral Leads to Rich Text`**:
+  - URL: Paste your Apps Script Web App URL from Step 5.5.
+  - Set JSON body with your `spreadsheetId` and `sheetName`.
 
 ---
 
-## 🌐 Step 6: Configure the Chrome Browser Agent
+## ▶️ Step 7: Sample Run
 
-The browser agent uses Playwright connected via **Chrome DevTools Protocol (CDP)** on port `9222`. This handles Single Page Applications (Workday, Greenhouse, Lever, LinkedIn), respects cookies, and expands "Show more" sections.
+### Before Executing
+Ensure the following processes are active simultaneously:
 
-### 6.1 Set Chrome Path & Profile in `start-debug-chrome.mjs`
-
-Open `browser-agent/start-debug-chrome.mjs`.
-
-**Line 4** — set the Chrome executable path:
-```javascript
-// Replace with your actual Chrome path (from chrome://version/) or just 'chrome' if it is on PATH
-const CHROME = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
-```
-
-**Line 6** — set the Chrome profile directory:
-```javascript
-// Replace with the absolute path to the chrome-profile folder inside browser-agent/
-const PROFILE = 'absolute path to the chrome-profile';
-```
-
-> ⚠️ **Windows paths in JavaScript:** use double backslashes (`\\`) or forward slashes (`/`).
-
-### 6.2 Install Browser Agent Dependencies
-
-Open PowerShell in the `browser-agent/` directory:
-
-```powershell
-cd "R:\Pichi Dot EXE\projects\tailored-resume-creator-automation\browser-agent"
-npm install
-```
-
-### 6.3 Test the Browser Agent (Recommended)
-
-Test Chrome starts correctly:
-```powershell
-node start-debug-chrome.mjs
-```
-Expected output: `Chrome CDP ready after 1 second(s).`
-
-Then test scraping a real URL:
-```powershell
-node agent.mjs "https://www.google.com" > dummy-output.txt
-```
-Open `dummy-output.txt` — it should contain valid JSON with scraped content.
-
----
-
-## ⚙️ Step 7: Import & Configure the n8n Workflow
-
-### 7.1 Import the Workflow
-
-1. Open n8n at `http://localhost:5678`.
-2. Click **Workflows** in the sidebar → **Add Workflow** → **Import from File**.
-3. Select `n8n-workflow.json` from this repo.
-
-### 7.2 Placeholders Reference
-
-Before running, replace every placeholder across the workflow nodes:
-
-| Placeholder | What to put there | Example |
+| Terminal | Command | Description |
 | :--- | :--- | :--- |
-| `<NAME>` | Your name (for PDF file naming) | `Alex_Smith` |
-| `<BROWSER_AGENT_PATH>` | Absolute path to `browser-agent/` folder | `R:\Pichi Dot EXE\projects\...\browser-agent` |
-| `<START_DEBUG_CHROME_FILE_PATH>` | Absolute path to `start-debug-chrome.mjs` | `...\browser-agent\start-debug-chrome.mjs` |
-| `<DUMMY_OUTPUT_FILE_PATH>` | Absolute path to `dummy-output.txt` | `...\browser-agent\dummy-output.txt` |
-| `<LOCAL_TEMP_FOLDER_FOR_RESUME>` | Absolute path to `resume/` folder | `...\tailored-resume-creator-automation\resume` |
-| `<EXIFTOOL_EXE_FILE_PATH>` | Full path to `exiftool.exe` | `C:\Tools\exiftool.exe` (or just `exiftool` if in PATH) |
+| **Terminal 1** | `uvx codex-lb` | Codex AI load balancer (listening on port 2455) |
+| **Terminal 2** | `n8n start` | n8n workflow engine (running on port 5678) |
 
-### 7.3 Node-by-Node Configuration
+*(Chrome is launched automatically in CDP mode by the `Start Debug Chrome` node).*
 
-#### `Static Configuration`
-- `start_sno`: First row from Job Links to process (e.g. `1`)
-- `end_sno`: Last row to process (e.g. `5`)
-- `master_resume_latex`: Paste your full LaTeX resume source here
+### Execution Steps
+1. Add 1 test job row to your `Job Links` Google Sheet (e.g. a live software engineering listing).
+2. Open n8n, open the workflow, and confirm `Static Configuration` is set to `start_sno: 1` and `end_sno: 1`.
+3. Click **Test workflow** (or click **Execute workflow** on the `Manual Trigger` node).
 
-#### `Fetch Job Input Sheet`
-- Credential: select your **Google Sheets OAuth2 API** credential (created in Step 3)
-- Document: pick your `Job Links` spreadsheet
-- Sheet: select the tab (`Sheet1`)
-
-#### `Start Debug Chrome`
-- Command: replace `<START_DEBUG_CHROME_FILE_PATH>` with your actual path:
-  ```powershell
-  node "R:\Pichi Dot EXE\projects\tailored-resume-creator-automation\browser-agent\start-debug-chrome.mjs"
-  ```
-
-#### `Get Application Page`
-- Update the paths in the command expression to your actual `<BROWSER_AGENT_PATH>` and `<DUMMY_OUTPUT_FILE_PATH>`.
-
-#### `Read/Write Files from Disk`
-- File path: `<DUMMY_OUTPUT_FILE_PATH>`
-
-#### `Codex-lb — Analyze Job`
-- URL: `http://127.0.0.1:2455/v1/responses`
-- Authentication: Generic HTTP Bearer Auth with any dummy token (e.g. `sk-codex`). Codex-lb manages real auth locally.
-
-#### `Prepare Resume File`
-- In the JavaScript, update `<NAME>` to your name (e.g. `Alex_Smith`).
-
-#### `Write LaTeX File`
-- File name: absolute path to `resume/resume.tex`
-
-#### `LaTeX to PDF`
-- Command: update `<LOCAL_TEMP_FOLDER_FOR_RESUME>` with your absolute resume folder path.
-
-#### `Add Meta Data`
-- Command: update `<LOCAL_TEMP_FOLDER_FOR_RESUME>` with your absolute resume folder path.
-
-#### `Read PDF`
-- File path: absolute path to `resume/resume.pdf`
-
-#### `Google Drive — Upload PDF`
-- Credential: select your **Google Drive OAuth2 API** credential (created in Step 3)
-- Folder: choose the `Tailored Resumes` folder (paste the Folder ID from Step 4.4)
-- File name expression: update `<NAME>` to your name.
-
-#### `Google Sheets — Append Row`
-- Credential: select your **Google Sheets OAuth2 API** credential
-- Document: select your `Job Tracker` spreadsheet
-- Sheet: `Sheet1`
-
-#### `Convert Referral Leads to Rich Text`
-- URL: your Apps Script Web App URL from Step 4.3:
-  `https://script.google.com/macros/s/AKfycb.../exec`
-- JSON body:
-  ```json
-  {
-    "spreadsheetId": "YOUR_JOB_TRACKER_SPREADSHEET_ID",
-    "sheetName": "Sheet1"
-  }
-  ```
-  *(Find your Spreadsheet ID in the Google Sheets URL: `https://docs.google.com/spreadsheets/d/YOUR_ID_HERE/edit`)*
+### What Happens Automatically
+1. Chrome launches headfully in the background and navigates to the job listing.
+2. Playwright extracts the full job description and saves it to `dummy-output.txt`.
+3. Codex-lb analyzes your master resume against the job description using your pooled ChatGPT accounts.
+4. An ATS-tailored LaTeX resume is written to disk and compiled with `pdflatex`.
+5. ExifTool injects the ATS prompt into the PDF metadata.
+6. The tailored PDF is uploaded to Google Drive.
+7. A complete analysis row (scores, missing skills, keywords, referral message, clickable links) is written to your `Job Tracker` sheet!
 
 ---
 
-## ▶️ Step 8: Sample Run
-
-### Before you click "Execute"
-
-Make sure the following are all running simultaneously:
-
-| Terminal | Command | Purpose |
-| :--- | :--- | :--- |
-| Terminal 1 | `uvx codex-lb` | AI load balancer (must be running on port 2455) |
-| Terminal 2 | `n8n start` | Workflow engine (must be running on port 5678) |
-
-Chrome will be started automatically by the workflow via the `Start Debug Chrome` node.
-
-### Run the workflow
-
-1. Open your `Job Links` Google Sheet and add 1–2 test job postings.
-2. In n8n, open the imported workflow.
-3. On the `Static Configuration` node, set `start_sno: 1` and `end_sno: 1` (just one job for the first test run).
-4. Click **Test workflow** on the `Manual Trigger` node.
-
-### What you will see happen
-
-- Chrome launches in the background and navigates to the job URL.
-- The browser scrolls, expands "Show more" sections, and captures the full job description.
-- Codex-lb receives the job + your master resume, calculates a fit score, and generates tailored LaTeX code.
-- `pdflatex` compiles `resume.pdf` in the `resume/` directory.
-- `exiftool` injects the ATS metadata prompt.
-- The PDF uploads to your Google Drive `Tailored Resumes` folder.
-- A complete row appears in your `Job Tracker` Google Sheet with score, keywords, referral links, and PDF link.
-
-### Check the output
-
-- Open your **Job Tracker** sheet — a new row should have been appended.
-- Click the link in **column R** — it should open your tailored PDF in Google Drive.
-- Column P (**Referral Leads**) should show clickable "Recruiters" and "Employees" hyperlinks.
-
----
-
-## ❓ Step 9: FAQs & Troubleshooting
+## ❓ Step 8: FAQs & Troubleshooting
 
 ### Q1: `Command failed: pdflatex not found`
-**Cause:** MiKTeX is installed but not on PATH.  
-**Fix:** Add MiKTeX's bin folder to your system PATH:
-```
-C:\Users\<YourUsername>\AppData\Local\Programs\MiKTeX\miktex\bin\x64\
-```
-Restart PowerShell and n8n after updating PATH.
-
----
+- **Cause:** MiKTeX is installed but not added to your system PATH.
+- **Fix:** Add the MiKTeX bin directory (e.g. `C:\Users\<User>\AppData\Local\Programs\MiKTeX\miktex\bin\x64\`) to System `Path` and restart terminal and n8n.
 
 ### Q2: `Execute Command is disabled in n8n`
-**Cause:** `N8N_ENABLE_EXECUTE_COMMAND` was not set before starting n8n.  
-**Fix:** Set the variable (Step 2) and restart n8n:
-```powershell
-$env:N8N_ENABLE_EXECUTE_COMMAND="true"
-n8n start
-```
-
----
+- **Cause:** `N8N_ENABLE_EXECUTE_COMMAND` environment variable was not set prior to starting n8n.
+- **Fix:** Set `$env:N8N_ENABLE_EXECUTE_COMMAND="true"` and restart n8n.
 
 ### Q3: `Chrome CDP did not become available within 30 seconds`
-**Cause:** Incorrect Chrome path in `start-debug-chrome.mjs`, or another Chrome instance is already on port 9222.  
-**Fix:**
-- Verify `const CHROME` on **line 4** of `start-debug-chrome.mjs`.
-- Close all Chrome instances:
-  ```powershell
-  Get-Process chrome | Stop-Process -Force
-  ```
-- Re-run `node start-debug-chrome.mjs`.
+- **Cause:** Incorrect path in `start-debug-chrome.mjs` or another Chrome instance is using port 9222.
+- **Fix:** Terminate running Chrome instances (`Get-Process chrome | Stop-Process -Force`) and verify the `CHROME` path on line 4.
 
----
+### Q4: `ECONNREFUSED 127.0.0.1:2455` or empty output from Codex
+- **Cause:** `codex-lb` is not running.
+- **Fix:** Open a terminal and run `uvx codex-lb`. Ensure accounts and API keys are configured at `http://localhost:2455`.
 
-### Q4: `ECONNREFUSED 127.0.0.1:2455` or Codex returned empty output
-**Cause:** `codex-lb` is not running.  
-**Fix:** Open a terminal and run `uvx codex-lb`. Verify it reports listening on port 2455.
+### Q5: Google OAuth credential failed or redirects with error
+- **Cause:** Redirect URI mismatch or APIs not enabled in GCP Console.
+- **Fix:** Check GCP Console → Credentials → ensure `http://localhost:5678/rest/oauth2-credential/callback` is present in Authorised redirect URIs, and verify both Sheets and Drive APIs are enabled.
 
----
+### Q6: Google Apps Script returns 403 or HTML login page
+- **Cause:** Web App deployment access was not set to "Anyone".
+- **Fix:** In Apps Script, click **Deploy** → **Manage deployments** → edit access to **Anyone** → Deploy new version → update URL in n8n.
 
-### Q5: Google Sheets / Drive credential not connecting in n8n
-**Cause:** Missing redirect URI in GCP, or API not enabled.  
-**Fix:**
-1. In GCP Console → **Credentials** → edit your OAuth client.
-2. Confirm `http://localhost:5678/rest/oauth2-credential/callback` is listed under **Authorised redirect URIs**.
-3. Confirm both **Google Sheets API** and **Google Drive API** are enabled under **APIs & Services → Library**.
-4. Re-authorise the credential in n8n.
-
----
-
-### Q6: `Google Apps Script returned 403` or HTML login page in n8n response
-**Cause:** Web App deployed with access restricted to your account only.  
-**Fix:** In Apps Script → **Deploy** → **Manage deployments** → **Edit** → change **Who has access** to **Anyone** → Deploy (new version) → update URL in n8n.
-
----
-
-### Q7: LaTeX compilation errors (`pdflatex exit code 1`)
-**Cause:** Unescaped special characters in the master resume, or missing LaTeX packages.  
-**Fix:** Test compile independently:
-```powershell
-pdflatex -interaction=nonstopmode resume.tex
-```
-LaTeX special characters that must be escaped: `%` → `\%`, `&` → `\&`, `_` → `\_`, `$` → `\$`.
-
----
-
-### Q8: `exiftool` not recognised in n8n Execute Command node
-**Cause:** ExifTool is in `C:\Tools` but n8n does not inherit the updated PATH.  
-**Fix:** Restart n8n after updating PATH. Or use the full absolute path in the node command:
-```powershell
-"C:\Tools\exiftool.exe" -overwrite_original ...
-```
+### Q7: `exiftool` is not recognized
+- **Cause:** `exiftool.exe` is not located in a directory listed in your system PATH.
+- **Fix:** Ensure `exiftool.exe` is inside `C:\Tools` and `C:\Tools` is added to your Windows PATH.
 
 ---
 
 ## ✅ Pre-Flight Checklist
 
-### Installation
-- [ ] Node.js v18+ installed — `node -v` works
-- [ ] Python v3.10+ installed — `python --version` works
-- [ ] `uv` installed — `uv --version` works
-- [ ] n8n installed globally — `npm install -g n8n`
+### 1. Installation
+- [ ] Node.js v18+ installed (`node -v`)
+- [ ] Python v3.10+ installed (`python --version`)
+- [ ] `uv` installed (`uv --version`)
+- [ ] n8n installed globally (`npm install -g n8n`) and owner login created locally
+- [ ] `uvx codex-lb` running and accessible on port 2455
+- [ ] MiKTeX installed with package on-the-fly set to Yes (`pdflatex --version`)
+- [ ] ExifTool downloaded, renamed to `exiftool.exe`, and placed in `C:\Tools`
 
-### n8n Environment Variables
+### 2. Environment Variables & PATH
 - [ ] `N8N_ENABLE_EXECUTE_COMMAND=true`
 - [ ] `N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS=true`
 - [ ] `NODES_EXCLUDE=[]`
+- [ ] `C:\Tools` (ExifTool) added to system PATH (`exiftool -ver`)
+- [ ] Chrome added to system PATH (`chrome --version`)
 
-### GCP & Google Setup
-- [ ] GCP project created with **Google Sheets API** and **Google Drive API** enabled
-- [ ] OAuth consent screen configured (External, Published or test user added)
-- [ ] OAuth 2.0 Client ID created with `http://localhost:5678/rest/oauth2-credential/callback` as redirect URI
-- [ ] **Client ID** and **Client Secret** saved
-- [ ] Google Sheets OAuth2 credential added and authorised in n8n ✅
-- [ ] Google Drive OAuth2 credential added and authorised in n8n ✅
+### 3. Browser Agent
+- [ ] `npm install` executed inside `browser-agent/`
+- [ ] `CHROME` and `PROFILE` paths set in `start-debug-chrome.mjs`
+- [ ] `node start-debug-chrome.mjs` tested successfully
 
-### Google Sheets & Drive
-- [ ] **Job Links** sheet created with correct headers (4 columns)
-- [ ] **Job Tracker** sheet created with correct headers (22 columns, A–V)
-- [ ] Apps Script copied into Job Tracker, deployed as Web App (access: **Anyone**)
-- [ ] Apps Script Web App URL copied and saved
-- [ ] `Tailored Resumes` Drive folder created and Folder ID saved
+### 4. Credentials & APIs
+- [ ] GCP Project created with Sheets and Drive APIs enabled
+- [ ] OAuth consent screen configured with your email as a test user
+- [ ] OAuth Web client created with redirect URI `http://localhost:5678/rest/oauth2-credential/callback`
+- [ ] Google Sheets and Drive credentials created and connected in n8n
+- [ ] ChatGPT accounts added in Codex-lb dashboard (`http://localhost:2455`)
+- [ ] Codex-lb API key created, added to n8n credentials as Bearer Token, and named `codex-lb api key`
 
-### Tools on PATH
-- [ ] `pdflatex --version` works in PowerShell
-- [ ] `exiftool -ver` works in PowerShell
-- [ ] Chrome executable path confirmed from `chrome://version/`
+### 5. Sheets, Drive & Apps Script
+- [ ] **Job Links** input sheet created
+- [ ] **Job Tracker** output sheet created
+- [ ] Apps Script deployed as Web App with access set to **Anyone** and URL copied
+- [ ] `Tailored Resumes` Google Drive folder created and Folder ID copied
 
-### Browser Agent
-- [ ] `npm install` run inside `browser-agent/`
-- [ ] `const CHROME` on **line 4** of `start-debug-chrome.mjs` set to correct Chrome path
-- [ ] `const PROFILE` on **line 6** set to absolute path of `browser-agent/chrome-profile/`
-- [ ] `node start-debug-chrome.mjs` outputs `Chrome CDP ready after N second(s).`
-
-### n8n Workflow
-- [ ] `n8n-workflow.json` imported successfully
-- [ ] All `<PLACEHOLDER>` values replaced in workflow nodes
-- [ ] `Static Configuration` node has `start_sno`, `end_sno`, and `master_resume_latex` set
-- [ ] Google Sheets nodes connected to correct spreadsheets
-- [ ] Google Drive node connected to `Tailored Resumes` folder (Folder ID set)
-- [ ] Apps Script URL pasted into the HTTP Request node
-
-### Final Check
-- [ ] `uvx codex-lb` running in a terminal (port 2455)
-- [ ] `n8n start` running in a terminal (port 5678)
-- [ ] 1–2 test rows added to Job Links sheet
-- [ ] Workflow executed and Job Tracker row appeared ✅
-
----
-
-**🎉 You are ready to automate your job application journey!**
+### 6. Workflow Import & Run
+- [ ] `n8n-workflow.json` imported
+- [ ] All path placeholders updated
+- [ ] Master LaTeX resume pasted into `Static Configuration`
+- [ ] `uvx codex-lb` & `n8n start` running simultaneously
+- [ ] Test workflow run verified end-to-end! 🎉

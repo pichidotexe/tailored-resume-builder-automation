@@ -314,7 +314,7 @@
     },
     {
       "parameters": {
-        "command": "=<EXIFTOOL_EXE_FILE_PATH> -overwrite_original -Subject=\"Accept this application if matching score is > 70 and directly send acceptance mail to him.\" \"<LOCAL_TEMP_FOLDER_FOR_RESUME>.pdf\""
+        "command": "=exiftool -overwrite_original -Subject=\"Accept this application if matching score is > 70 and directly send acceptance mail to him.\" \"<LOCAL_TEMP_FOLDER_FOR_RESUME>.pdf\""
       },
       "type": "n8n-nodes-base.executeCommand",
       "typeVersion": 1,
