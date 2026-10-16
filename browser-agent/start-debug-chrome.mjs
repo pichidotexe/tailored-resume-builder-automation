@@ -3,7 +3,7 @@ import http from 'node:http';
 
 const CHROME = 'chrome';
 
-const PROFILE = 'Debug Chrome Path Profile Path';
+const PROFILE = 'Debug Chrome Profile Path';
 
 const CDP_URL = 'http://127.0.0.1:9222/json/version';
 
